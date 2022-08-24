@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Bitcoin JavaScript Tutorial</title>
+    <link rel="stylesheet" type="text/css" href="build/reset.css">
+    <link rel="stylesheet" type="text/css" href="build/main.css">
+
+</head>
+
+<body>
+   
+    <header>
+        <h1>Try Bitcoin</h1>
+    </header>
+
+    <div class="main">
+
+        <div class="console">
+            <div class="console-text">
+                <p class="console-header">Enter commands here</p>
+                <ul>
+                    <li class="console-input-container">
+                        <label>
+                            <span class="console-prompt">&gt; </span>
+                            <input class="console-input" />
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <div class="lesson lesson1">
+                <h2>Getting started with Bitcoin</h2>
+                <p>This is an interactive Bitcoin tutorial that uses JavaScript. It uses popular open source Bitcoin libraries to explain different parts of the Bitcoin network.</p>
+                <p>If you get stuck at any point in the tutorial, run the <code>help</code> command.</p>
+                <p>To begin, type <code>start</code> into the console that's to the left.</p>
+            </div>
+
+            <div class="lesson lesson2">
+                <h2>Most people are familiar with bitcoin as a type of money, but what does it mean to own some?</h2>
+                <p>Units of bitcoin are assigned to something called <strong>public keys</strong>.</p>
+                <p>For more advanced scenarios, bitcoin can belong to scripts that involve multiple public keys. But no need to be concerned about that for now. We'll cover it later.</p>
+                <p>Every public key has a corresponding <strong>private key</strong>. The public key is meant to be shared. The private key should never be revealed to anyone else. </p>
+                <p>Let's start by generating a pair of public and private keys to see what they look like.</p>
+                <p>Type <code>generateKeys()</code> into the console to create a keypair.</p>
+            </div>
+
+            <div class="lesson lesson3">
+                <p>As you can see, public and private keys are just strings of letters and numbers. These ones are encoded in hex.</p>
+                <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information, and the public key is used to verify the signature's authenticity.</p>
+                <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify that the signature indeed came from you.</p>
+                <p>Type <code>sign(privateKey, 'Cypherpunks write code')</code> to sign a message that says 'Cypherpunks write code'. The digital signature will be returned.</p>
+            </div>
+
+            <p id="schnorr"></p>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Made with love ❤️ by <a href="http://technicaldifficulties.io/">satsie</a>.</p>
+    </footer>
+
+    <!-- This div is always hidden; it's for cloning from -->
+    <div class="hidden-storage">
+        <ul>
+            <li class="prompt-completed">
+                <span class="prompt">&gt; </span>
+                <code></code>
+            </li>
+            <li class="prompt-result"><code></code></li>
+        </ul>
+    </div>
+
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
+    <script src="js/bundle.js"></script>
+</body>
+
+</html>

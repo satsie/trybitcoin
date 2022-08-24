@@ -1,0 +1,215 @@
+/**
+ * tryregex
+ *
+ * Copyright (c) 2014 Callum Macrae
+ */
+
+ @bgGray: #efefef;
+ @textColor: #222;
+ @promptColor: #185694;
+ @responseColor: @promptColor;
+ @errorColor: #d14;
+ @codeColor: #128905;
+ 
+ // http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+ html {
+     box-sizing: border-box;
+ }
+ *, *:before, *:after {
+     box-sizing: inherit;
+ }
+ 
+ html, body {
+     padding: 0;
+     margin: 0;
+     height: 100%;
+ }
+ 
+ body {
+     display: flex;
+     flex-direction: column;
+ 
+     font-family: "Open Sans", sans-serif;
+     color: @textColor;
+ }
+ 
+ header {
+     margin-bottom: 40px;
+     height: 120px;
+     min-height: 80px;
+ 
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+ 
+     background-color: @bgGray;
+     text-align: center;
+ 
+     h1 {
+         text-transform: uppercase;
+         font-size: 48pt;
+         font-weight: bold;
+     }
+ }
+ 
+ .main {
+     display: flex;
+     flex: 1;
+     flex-direction: row;
+     width: calc(~"100% - 60px");
+     min-height: 350px;
+     margin: 0 auto;
+ 
+     & > div {
+         flex: 1;
+     }
+ 
+     @media all and (max-width: 640px) {
+         flex-direction: column;
+ 
+         .console {
+             padding: 0 50px 0 20px;
+         }
+ 
+         .tutorial {
+             flex: 3;
+             margin-bottom: 20px;
+             order: -1;
+         }
+     }
+ 
+     .console {
+         padding-right: 20px;
+         font-family: monospace;
+         overflow: auto;
+         background-color: beige;
+         border-style: dashed;
+         border-color: black;
+         border-width: thin;
+ 
+        .console-text {
+          padding-left: 10px;
+          padding-top: 10px;
+        }
+
+         .info {
+ //			font-family: "Open Sans", sans-serif;
+             color: @textColor;
+             margin-bottom: 10px;
+         }
+ 
+         code {
+             white-space: pre-wrap;
+             word-break: break-all;
+             color: @responseColor;
+         }
+ 
+         .prompt + code {
+             color: @codeColor;
+         }
+ 
+         .prompt + code {
+           color: @codeColor;
+         }
+ 
+         .prompt {
+             color: @promptColor;
+         }
+ 
+         input {
+             font-size: 13px;
+             font-family: monospace;
+             border: 0;
+             outline: none;
+             background: transparent;
+ 
+             width: calc(~"100% - 30px");
+ 
+             // margin-top: -2px;
+             margin-left: -1px;
+         }
+ 
+         li:nth-child(even) {
+             margin: 5px 16px;
+         }
+ 
+         .error {
+             color: @errorColor;
+         }
+     }
+ 
+     .instructions {
+         padding: 0 50px 0 20px;
+         overflow: auto;
+ 
+         h2 {
+             font-size: 18pt;
+             font-weight: 600;
+             margin-bottom: 20px;
+         }
+ 
+         p, pre {
+             line-height: 1.4;
+             margin-bottom: 10px;
+         }
+ 
+         li {
+             line-height: 1.4;
+             margin-bottom: 5px;
+         }
+ 
+         code {
+             font-family: monospace;
+             white-space: pre;
+             border-radius: 3px;
+             background: #eee;
+             padding: 3px;
+             color: @codeColor;
+         }
+ 
+         em {
+             font-style: italic;
+         }
+ 
+         strong {
+             font-weight: bold;
+         }
+ 
+         .lesson:not(.lesson1) {
+             display: none;
+         }
+     }
+ }
+ 
+ footer {
+     margin-top: 30px;
+     height: 90px;
+     min-height: 40px;
+ 
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+ 
+     background-color: @bgGray;
+     text-align: center;
+ 
+     @media all and (max-width: 640px) {
+         height: 40px;
+     }
+ 
+     @media all and (max-width: 500px) {
+         small {
+             display: none;
+         }
+     }
+ }
+ 
+ @media all and (max-width: 500px) {
+     .gh-ribbon {
+         display: none;
+     }
+ }
+ 
+ .hidden-storage {
+     display: none;
+ }
