@@ -29,7 +29,7 @@ gulp.task('browserify', function() {
         .bundle()
         //Pass desired output filename to vinyl-source-stream
         // This is the file that index.js is looking for
-        .pipe(source('js/bundle.js'))
+        .pipe(source('build/bundle.js'))
         // Start piping stream to tasks!
         .pipe(gulp.dest('./'))
         .pipe(browserSync.stream());

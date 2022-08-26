@@ -4,12 +4,13 @@
  * Copyright (c) 2014 Callum Macrae
  */
 
- @bgGray: #efefef;
+ @bgAccent: #f5f2e3;
  @textColor: #222;
- @promptColor: #185694;
+ @promptColor: #ed602b;
  @responseColor: @promptColor;
  @errorColor: #d14;
- @codeColor: #128905;
+ @codeColor: #222;
+ @orangeColor: #ed602b;
  
  // http://www.paulirish.com/2012/box-sizing-border-box-ftw/
  html {
@@ -42,13 +43,14 @@
      flex-direction: column;
      justify-content: center;
  
-     background-color: @bgGray;
+     background-color: @bgAccent;
      text-align: center;
  
      h1 {
          text-transform: uppercase;
          font-size: 48pt;
          font-weight: bold;
+         color: @orangeColor;
      }
  }
  
@@ -82,11 +84,14 @@
          padding-right: 20px;
          font-family: monospace;
          overflow: auto;
-         background-color: beige;
+         background-color: #fbfaf3;
          border-style: dashed;
-         border-color: black;
+         border-color: @orangeColor;
          border-width: thin;
  
+        .console-header {
+            color: @orangeColor;
+        }
         .console-text {
           padding-left: 10px;
           padding-top: 10px;
@@ -142,7 +147,7 @@
      }
  
      .instructions {
-         padding: 0 50px 0 20px;
+         padding: 0 50px 0 50px;
          overflow: auto;
  
          h2 {
@@ -187,22 +192,17 @@
  footer {
      margin-top: 30px;
      height: 90px;
-     min-height: 40px;
  
      display: flex;
      flex-direction: column;
      justify-content: center;
  
-     background-color: @bgGray;
+     background-color: @bgAccent;
      text-align: center;
- 
-     @media all and (max-width: 640px) {
-         height: 40px;
-     }
  
      @media all and (max-width: 500px) {
          small {
-             display: none;
+          display: none;
          }
      }
  }
