@@ -31,6 +31,23 @@ let publicKey;
 
 // store the lesson number in local storage so the user can leave and come back
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
+let localDataString = localStorage.getItem('localData') || '';
+let localData = {};
+try {
+    localData = JSON.parse(localDataString);
+} catch (e) {
+    console.log('Error parsing localData. Setting to empty object.');
+}
+
+// Populate any existing values from the local storage
+if (Object.keys(localData).length > 0) {
+    if (localData.privateKey) {
+        privateKey = localData.privateKey;
+    }
+    if (localData.publicKey) {
+        publicKey = localData.publicKey;
+    }
+}
 
 // Hide the previous lesson page and show the next one
 function startLesson(lessonNumber) {
@@ -61,22 +78,34 @@ function generateKeys() {
     const publicKeyHex = 'DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659';
 
     // Save the keys for use in subsequent lessons
-    // TODO this will not persist after the user leaves the page and returns. probs want to move to local storage
     privateKey = privateKeyHex;
     publicKey = publicKeyHex;
+
+    // Also persist to local storage
+    saveToLocalStorage('privateKey', privateKey);
+    saveToLocalStorage('publicKey', publicKey);
 
     return {publicKey: publicKeyHex, privateKey: privateKeyHex};
 }
 
+function saveToLocalStorage(key, value) {
+    localData[key] = value;
+    localStorage.setItem('localData', JSON.stringify(localData));
+}
+
 function sign(privateKeyHex, messageString) {
-    console.log('in sign method');
+    // save the message to local storage
+    saveToLocalStorage('message', messageString);
+
     const hexMessage = messageString.hexEncode();
 
     // bip-schnorr lib requires the message to be 32 bytes
     const messageBuffer = Buffer.from(hexMessage, 'hex');
     const totalLength = 32;
     const messageBufferPadded = Buffer.concat([messageBuffer], totalLength);
-    return schnorr.sign(privateKey, messageBufferPadded);
+
+    const schnorrSig = schnorr.sign(privateKey, messageBufferPadded);
+    return schnorrSig.toString('hex');
 }
 
 function evaluateCode(userInput) {
@@ -135,6 +164,9 @@ $(function() {
 
                 // clear the user input
                 $userInput.val('');
+
+                // clear the rest of the data stored locally
+                localStorage.setItem('localData', {});
                 return;
             }
 
@@ -162,6 +194,8 @@ $(function() {
 
                     advanceLesson();
                     // move onto the next lesson automatically. Eventually will want to put a button in place
+                } else {
+                    result = 'Please type \'start\'';
                 }
             } else if (currentLesson === 2) {
                 // Some protections against an attack. Need to revist how dangerous running eval() is.
@@ -170,6 +204,8 @@ $(function() {
                     result = JSON.stringify(evalResult, undefined, 2);
                     error = false;
                     advanceLesson();
+                } else {
+                    result = 'Please type \'generateKeys()\'';
                 }
             } else if (currentLesson === 3) {
                 if (lowercaseUserInputString.includes('sign')) {
@@ -179,6 +215,10 @@ $(function() {
                     error = false;
                     advanceLesson();
                 }
+            }
+
+            if (error === true) {
+                result = '<strong class = "error">' + result + '</strong>';
             }
 
             // print the result

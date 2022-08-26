@@ -33,25 +33,26 @@
         <div class="instructions">
             <div class="lesson lesson1">
                 <h2>Getting started with Bitcoin</h2>
-                <p>This is an interactive Bitcoin tutorial that uses JavaScript. It uses popular open source Bitcoin libraries to explain different parts of the Bitcoin network.</p>
+                <p>This is an interactive Bitcoin tutorial that uses JavaScript and popular open source Bitcoin libraries like <a href='https://github.com/guggero/bip-schnorr' target="_blank">bip-schnorr</a> to explain different parts of the Bitcoin network.</p>
                 <p>If you get stuck at any point in the tutorial, run the <code>help</code> command.</p>
-                <p>To begin, type <code>start</code> into the console that's to the left.</p>
+                <p>To begin, type <code>start</code> into the console on the left.</p>
             </div>
 
             <div class="lesson lesson2">
                 <h2>Most people are familiar with bitcoin as a type of money, but what does it mean to own some?</h2>
-                <p>Units of bitcoin are assigned to something called <strong>public keys</strong>.</p>
-                <p>For more advanced scenarios, bitcoin can belong to scripts that involve multiple public keys. But no need to be concerned about that for now. We'll cover it later.</p>
-                <p>Every public key has a corresponding <strong>private key</strong>. The public key is meant to be shared. The private key should never be revealed to anyone else. </p>
+                <p>Units of bitcoin are assigned to things called <strong>public keys</strong>.</p>
+                <p>For more advanced scenarios, bitcoin can belong to scripts that involve multiple public keys.</p>
+                <p>Every public key has a corresponding <strong>private key</strong>.</p>
+                <p>The public key is meant to be shared. The private key should never be revealed to anyone else. </p>
                 <p>Let's start by generating a pair of public and private keys to see what they look like.</p>
                 <p>Type <code>generateKeys()</code> into the console to create a keypair.</p>
             </div>
 
             <div class="lesson lesson3">
-                <p>As you can see, public and private keys are just strings of letters and numbers. These ones are encoded in hex.</p>
-                <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information, and the public key is used to verify the signature's authenticity.</p>
-                <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify that the signature indeed came from you.</p>
-                <p>Type <code>sign(privateKey, 'Cypherpunks write code')</code> to sign a message that says 'Cypherpunks write code'. The digital signature will be returned.</p>
+                <p>As you can see, public and private keys can be represented by strings of letters and numbers. These ones are encoded in hex.</p>
+                <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information. Then, the public key is used to verify the signature's authenticity.</p>
+                <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify the signature came from you.</p>
+                <p>The private key you generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>sign(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
             </div>
 
             <p id="schnorr"></p>

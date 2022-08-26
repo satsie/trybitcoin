@@ -106,14 +106,12 @@
  
          .prompt + code {
              color: @codeColor;
-         }
- 
-         .prompt + code {
-           color: @codeColor;
+             font-size: 13px;
          }
  
          .prompt {
              color: @promptColor;
+             font-size: 13px;
          }
  
          input {
@@ -132,9 +130,14 @@
          li:nth-child(even) {
              margin: 5px 16px;
          }
- 
+
+         li:nth-child(odd) {
+            margin: 5px 0px;
+        }
+
          .error {
              color: @errorColor;
+             font-size: 13px;
          }
      }
  
