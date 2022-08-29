@@ -50,4 +50,8 @@ gulp.task('browser-sync', function() {
 
 });
 
-gulp.task('build', gulp.series('less', 'browserify', 'browser-sync'));
+// build and launch the app
+gulp.task('dev', gulp.series('less', 'browserify', 'browser-sync'));
+
+// just build
+gulp.task('build', gulp.series('less', 'browserify'));

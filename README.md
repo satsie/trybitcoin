@@ -32,8 +32,9 @@ It's static HTML, you don't need anything special to serve the files.
 
 Helpful commands:
 
-- `gulp build`: turn LESS code into CSS, compile all JS with browserify so the browser can access node-flavored commonjs modules, and start. Run [browser-sync](http://browsersync.io/) to watch for any changes to the HTML, CSS, or JS code updates. Compile and inject changes as they're made.
-- `gulp lint`: TODO
+- `gulp build`: turn LESS code into CSS, compile all JS with browserify so the browser can access node-flavored commonjs modules.
+- `gulp dev`: Build and run the site. Uses [browser-sync](http://browsersync.io/) to watch for any changes to the HTML, CSS, or JS code updates. Compiles and injects changes as they're made.
+
 
 ## License
 
