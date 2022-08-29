@@ -2,31 +2,14 @@ var $ = require('jquery');
 const Buffer = require('safe-buffer').Buffer;
 const BigInteger = require('bigi');
 const schnorr = require('bip-schnorr');
+const stringUtils = require('./stringUtils');
+const constants = require('./constants');
 
-
-String.prototype.hexEncode = function(){
-    var hex, i;
-
-    var result = "";
-    for (i=0; i<this.length; i++) {
-        hex = this.charCodeAt(i).toString(16);
-        result += ("000"+hex).slice(-4);
-    }
-
-    return result;
-}
-
-const keyMap = {
-    ENTER: 'Enter',
-    LEFT: 37,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40,
-    L: 76
-}
-
+let mostRecentCommand;
 let privateKey;
 let publicKey;
+let message;
+let signature;
 
 // store the lesson number in local storage so the user can leave and come back
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
@@ -40,11 +23,24 @@ try {
 
 // Populate any existing values from the local storage
 if (Object.keys(localData).length > 0) {
+    if (localData.mostRecentCommand) {
+        mostRecentCommand = localData.mostRecentCommand;
+    }
+
     if (localData.privateKey) {
         privateKey = localData.privateKey;
     }
+
     if (localData.publicKey) {
         publicKey = localData.publicKey;
+    }
+
+    if (localData.message) {
+        message = localData.message;
+    }
+
+    if (localData.signature) {
+        signature = localData.signature;
     }
 }
 
@@ -70,6 +66,11 @@ function advanceLesson() {
     startLesson(currentLesson);
 }
 
+function saveToLocalStorage(key, value) {
+    localData[key] = value;
+    localStorage.setItem('localData', JSON.stringify(localData));
+}
+
 function generateKeys() {
     // literally just the example from https://github.com/guggero/bip-schnorr
     // TODO actually generate some that are different every time
@@ -87,53 +88,159 @@ function generateKeys() {
     return {publicKey: publicKeyHex, privateKey: privateKeyHex};
 }
 
-function saveToLocalStorage(key, value) {
-    localData[key] = value;
-    localStorage.setItem('localData', JSON.stringify(localData));
-}
+function signMessage(privateKeyHex, messageString) {
+    if (messageString === undefined) {
+        throw Error('message parameter is undefined');
+    }
 
-function sign(privateKeyHex, messageString) {
     // save the message to local storage
     saveToLocalStorage('message', messageString);
-
-    const hexMessage = messageString.hexEncode();
+    message = messageString;
 
     // bip-schnorr lib requires the message to be 32 bytes
-    const messageBuffer = Buffer.from(hexMessage, 'hex');
-    const totalLength = 32;
-    const messageBufferPadded = Buffer.concat([messageBuffer], totalLength);
+    const messageBuffer = stringUtils.convertToMessageBuffer(message);
 
-    const schnorrSig = schnorr.sign(privateKey, messageBufferPadded);
-    return schnorrSig.toString('hex');
+    const schnorrSig = schnorr.sign(privateKeyHex, messageBuffer);
+    const schnorrSigHex = schnorrSig.toString('hex');
+
+    // save the signature to local store
+    saveToLocalStorage('signature', schnorrSigHex);
+    signature = schnorrSigHex;
+
+    return {signature: schnorrSigHex};
+}
+
+function verifySignature(aPublicKeyHex, aMessage, aSignature) {
+    const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
+    const signatureBuffer = Buffer.from(aSignature, 'hex');
+    const messageBuffer = stringUtils.convertToMessageBuffer(aMessage);
+
+    // the bip-schnorr lib will throw an error if this is not valid
+    schnorr.verify(publicKeyBuffer, messageBuffer, signatureBuffer);
+    return {valid: true};
+}
+
+// sanity check the user command before sending it off to eval()
+// provides minor protection against blindly running eval() on user input, but the security
+// still needs to be revisited
+// returns true if the sanity check passes
+function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
+    const errorResponse = {
+        lesson1: 'Please type \'start\'',
+        lesson2: 'Please type \'generateKeys()\'',
+        lesson3: 'Please invoke the \'signMessage\' function',
+        lesson4: 'Please invoke the \'verifySignature\' function'
+    };
+
+    // It's ok if the user wants to put a semicolon at the end, but remove it to
+    // make validation a little simpler
+    if (aLowercaseInputString.endsWith(';')) {
+        aLowercaseInputString = aLowercaseInputString.slice(0, -1);
+    }
+
+    if (currentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
+        return errorResponse[`lesson${currentLesson}`];
+    }
+
+    // check for the opening parenthesis in the function call because without it
+    // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`
+    // which would just return the function definition
+    switch (currentLesson) {
+        case 1:
+            if (aLowercaseInputString.startsWith('start')) {
+                return true;
+            }
+        case 2:
+            if (aLowercaseInputString.startsWith('generatekeys(')) {
+                return true;
+            }
+        case 3:
+            if (aLowercaseInputString.startsWith('signmessage(')) {
+                return true;
+            }
+        case 4:
+            if (aLowercaseInputString.startsWith('verifysignature(')) {
+                return true;
+            }
+        default:
+            return errorResponse[`lesson${currentLesson}`];
+    }
+
+    return false;
 }
 
 function evaluateCode(userInput) {
-    // Some protections for running eval()
-    if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1) {
-        return 'undefined;' + userInput;
+    let returnObject = {
+        success: true,
+        result: ''
+    };
+
+    // Some protections for blindly feeding user input into eval()
+    if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1
+        || userInput.indexOf('eval') !== -1) {
+        returnObject.result = 'undefined;' + userInput;
+        return returnObject;
     }
 
-    // TODO error handling. What if user types in something invalid?
-    return eval(userInput);
+    try {
+        const evalResult = eval(userInput);
+        returnObject.result = evalResult;
+    } catch (e) {
+        returnObject.success = false;
+        returnObject.result = `Error while trying to execute '${userInput}'. Message: ${e.message}`;
+    }
+
+    return returnObject;
 }
 
-// document ready()
+function printResult($userInput, $consolePrompt, isError, aResult) {
+    let result = aResult;
+
+    const userInputString = $('.console-input').val();
+
+    // take the user input and dispaly as a label
+    $('.prompt-completed').clone()
+        .removeClass('prompt-completed')
+        .insertBefore($consolePrompt)
+        .find('code')
+        .text(userInputString);
+
+    // clear the user input
+    $userInput.val('');
+
+    if (isError === true) {
+        result = '<strong class = "error">' + result + '</strong>';
+    }
+
+    // print the result
+    $('.prompt-result').clone()
+      .removeClass('prompt-result')
+      .insertBefore($consolePrompt)
+      .find('code')
+      [isError ? 'html' : 'text'](result);
+}
+
+// This is the same opening line as 'document ready()'
 $(function() {
     // all custom jQuery will go here
     //  .html:              <p id="demo"></p>
     //  .js:                $("#demo").html("Hello, World!");
 
     console.log('current lesson: ' + currentLesson);
+
+    const $console = $('.console');
+    const $consolePrompt = $('.console-prompt');
+    const $userInput = $('.console-input');
+
+    // Focus on the user input box
+    $userInput.trigger('focus');
+
     if (currentLesson !== 1) {
         // hide lesson 1, which is turned on by default
         $('.lesson1').hide();
 
         startLesson(currentLesson);
     }
-
-    const $console = $('.console');
-    const $consolePrompt = $('.console-prompt');
-    const $userInput = $('.console-input');
 
     // If the user clicks anywhere in the console box, focus the cursor on the input line
     $console.on('click', function (e) {
@@ -144,11 +251,13 @@ $(function() {
         const userInputString = $('.console-input').val();
         const lowercaseUserInputString = userInputString.toLowerCase();
 
-        if (e.key === keyMap.ENTER) {
+        if (e.key === constants.keyMap.ENTER) {
+            // save the most recent command
+            mostRecentCommand = userInputString;
+            saveToLocalStorage('mostRecentCommand', userInputString);
 
             // do nothing if there is no user input
             if (userInputString.length === 0) {
-                // window.reset();
                 return;
             }
 
@@ -173,63 +282,39 @@ $(function() {
                 // TODO show the answer
             }
 
-            // take the user input and dispaly as a label
-            $('.prompt-completed').clone()
-                .removeClass('prompt-completed')
-                .insertBefore($consolePrompt)
-                .find('code')
-                .text(userInputString);
-
-            // clear the user input
-            $userInput.val('');
-
             let result = '';
             let error = true;
 
-            // check what the user entered. this code will eventually need to route to different lessons
-            if (currentLesson === 1) {
-                if (lowercaseUserInputString === 'start') {
-                    error = false;
+            const sanityCheckResult = userInputSanityCheck(currentLesson, lowercaseUserInputString)
+            result = sanityCheckResult;
 
-                    advanceLesson();
-                    // move onto the next lesson automatically. Eventually will want to put a button in place
-                } else {
-                    result = 'Please type \'start\'';
-                }
-            } else if (currentLesson === 2) {
-                // Some protections against an attack. Need to revist how dangerous running eval() is.
-                if (lowercaseUserInputString.includes('generatekeys')) {
-                    const evalResult = evaluateCode(userInputString);
-                    result = JSON.stringify(evalResult, undefined, 2);
-                    error = false;
-                    advanceLesson();
-                } else {
-                    result = 'Please type \'generateKeys()\'';
-                }
-            } else if (currentLesson === 3) {
-                if (lowercaseUserInputString.includes('sign')) {
-                    const evalResult = evaluateCode(userInputString);
+            // check what th this code will eventually need to route to different lessonse user entered
+            if (sanityCheckResult === true && currentLesson === 1) {
+                error = false;
+                result = '';
 
-                    result = JSON.stringify(evalResult.toString('hex'), undefined, 2);
+                // move onto the next lesson automatically
+                advanceLesson();
+            } else if (sanityCheckResult === true){
+                const evalResult = evaluateCode(userInputString);
+
+                if (evalResult.success === true) {
+                    result = JSON.stringify(evalResult.result, undefined, 2);
                     error = false;
                     advanceLesson();
+                } else {
+                    result = evalResult.result;
                 }
             }
 
-            if (error === true) {
-                result = '<strong class = "error">' + result + '</strong>';
-            }
-
-            // print the result
-            $('.prompt-result').clone()
-              .removeClass('prompt-result')
-              .insertBefore($consolePrompt)
-              .find('code')
-              [error ? 'html' : 'text'](result);
+            printResult($userInput, $consolePrompt, error, result);
         }
 
-        if (e.key === keyMap.UP) {
-            // TODO look at history if user presses up
+        // enter the most recent command if the user presses the up arrow
+        if (e.key === constants.keyMap.UP) {
+            if (mostRecentCommand) {
+                $userInput.val(mostRecentCommand);
+            }
         };
     });
 });

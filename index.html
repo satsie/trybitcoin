@@ -50,12 +50,17 @@
 
             <div class="lesson lesson3">
                 <p>As you can see, public and private keys can be represented by strings of letters and numbers. These ones are encoded in hex.</p>
-                <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information. Then, the public key is used to verify the signature's authenticity.</p>
+                <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information. The public key is then used to verify the signature's authenticity.</p>
                 <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify the signature came from you.</p>
-                <p>The private key you generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>sign(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
+                <p>The private key you generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>signMessage(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
             </div>
 
             <div class="lesson lesson4">
+                <p>Nice work! We've signed a message with a private key. Now we can use the corresponding public key to verify the signature's authenticity.</p>
+                <p>Type <code>verifySignature(publicKey, message, signature)</code> to verify the message created in the previous step.</p>
+            </div>
+
+            <div class="lesson lesson5">
                 <p>That's all for now! Thank you for checking out this proof-of-concept.</p>
                 <p>Type <code>reset</code> to do it all over again.</p>
             </div>

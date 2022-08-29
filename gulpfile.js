@@ -43,7 +43,7 @@ gulp.task('browser-sync', function() {
     });
 
     gulp.watch("*.html").on("change", browserSync.reload);
-    gulp.watch("./js/scripts.js", gulp.series('browserify'));
+    gulp.watch("./js/*.js", gulp.series('browserify'));
 
     // This probabaly doesn't belong in this task?
     gulp.watch('less/*.less', gulp.series('less'));

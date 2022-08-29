@@ -1,33 +1,27 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-var $ = require('jquery');
-const Buffer = require('safe-buffer').Buffer;
-const BigInteger = require('bigi');
-const schnorr = require('bip-schnorr');
-
-
-String.prototype.hexEncode = function(){
-    var hex, i;
-
-    var result = "";
-    for (i=0; i<this.length; i++) {
-        hex = this.charCodeAt(i).toString(16);
-        result += ("000"+hex).slice(-4);
-    }
-
-    return result;
-}
-
 const keyMap = {
     ENTER: 'Enter',
     LEFT: 37,
-    UP: 38,
+    UP: 'ArrowUp',
     RIGHT: 39,
     DOWN: 40,
     L: 76
 }
 
+exports.keyMap = keyMap;
+},{}],2:[function(require,module,exports){
+var $ = require('jquery');
+const Buffer = require('safe-buffer').Buffer;
+const BigInteger = require('bigi');
+const schnorr = require('bip-schnorr');
+const stringUtils = require('./stringUtils');
+const constants = require('./constants');
+
+let mostRecentCommand;
 let privateKey;
 let publicKey;
+let message;
+let signature;
 
 // store the lesson number in local storage so the user can leave and come back
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
@@ -41,11 +35,24 @@ try {
 
 // Populate any existing values from the local storage
 if (Object.keys(localData).length > 0) {
+    if (localData.mostRecentCommand) {
+        mostRecentCommand = localData.mostRecentCommand;
+    }
+
     if (localData.privateKey) {
         privateKey = localData.privateKey;
     }
+
     if (localData.publicKey) {
         publicKey = localData.publicKey;
+    }
+
+    if (localData.message) {
+        message = localData.message;
+    }
+
+    if (localData.signature) {
+        signature = localData.signature;
     }
 }
 
@@ -71,6 +78,11 @@ function advanceLesson() {
     startLesson(currentLesson);
 }
 
+function saveToLocalStorage(key, value) {
+    localData[key] = value;
+    localStorage.setItem('localData', JSON.stringify(localData));
+}
+
 function generateKeys() {
     // literally just the example from https://github.com/guggero/bip-schnorr
     // TODO actually generate some that are different every time
@@ -88,53 +100,159 @@ function generateKeys() {
     return {publicKey: publicKeyHex, privateKey: privateKeyHex};
 }
 
-function saveToLocalStorage(key, value) {
-    localData[key] = value;
-    localStorage.setItem('localData', JSON.stringify(localData));
-}
+function signMessage(privateKeyHex, messageString) {
+    if (messageString === undefined) {
+        throw Error('message parameter is undefined');
+    }
 
-function sign(privateKeyHex, messageString) {
     // save the message to local storage
     saveToLocalStorage('message', messageString);
-
-    const hexMessage = messageString.hexEncode();
+    message = messageString;
 
     // bip-schnorr lib requires the message to be 32 bytes
-    const messageBuffer = Buffer.from(hexMessage, 'hex');
-    const totalLength = 32;
-    const messageBufferPadded = Buffer.concat([messageBuffer], totalLength);
+    const messageBuffer = stringUtils.convertToMessageBuffer(message);
 
-    const schnorrSig = schnorr.sign(privateKey, messageBufferPadded);
-    return schnorrSig.toString('hex');
+    const schnorrSig = schnorr.sign(privateKeyHex, messageBuffer);
+    const schnorrSigHex = schnorrSig.toString('hex');
+
+    // save the signature to local store
+    saveToLocalStorage('signature', schnorrSigHex);
+    signature = schnorrSigHex;
+
+    return {signature: schnorrSigHex};
+}
+
+function verifySignature(aPublicKeyHex, aMessage, aSignature) {
+    const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
+    const signatureBuffer = Buffer.from(aSignature, 'hex');
+    const messageBuffer = stringUtils.convertToMessageBuffer(aMessage);
+
+    // the bip-schnorr lib will throw an error if this is not valid
+    schnorr.verify(publicKeyBuffer, messageBuffer, signatureBuffer);
+    return {valid: true};
+}
+
+// sanity check the user command before sending it off to eval()
+// provides minor protection against blindly running eval() on user input, but the security
+// still needs to be revisited
+// returns true if the sanity check passes
+function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
+    const errorResponse = {
+        lesson1: 'Please type \'start\'',
+        lesson2: 'Please type \'generateKeys()\'',
+        lesson3: 'Please invoke the \'signMessage\' function',
+        lesson4: 'Please invoke the \'verifySignature\' function'
+    };
+
+    // It's ok if the user wants to put a semicolon at the end, but remove it to
+    // make validation a little simpler
+    if (aLowercaseInputString.endsWith(';')) {
+        aLowercaseInputString = aLowercaseInputString.slice(0, -1);
+    }
+
+    if (currentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
+        return errorResponse[`lesson${currentLesson}`];
+    }
+
+    // check for the opening parenthesis in the function call because without it
+    // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`
+    // which would just return the function definition
+    switch (currentLesson) {
+        case 1:
+            if (aLowercaseInputString.startsWith('start')) {
+                return true;
+            }
+        case 2:
+            if (aLowercaseInputString.startsWith('generatekeys(')) {
+                return true;
+            }
+        case 3:
+            if (aLowercaseInputString.startsWith('signmessage(')) {
+                return true;
+            }
+        case 4:
+            if (aLowercaseInputString.startsWith('verifysignature(')) {
+                return true;
+            }
+        default:
+            return errorResponse[`lesson${currentLesson}`];
+    }
+
+    return false;
 }
 
 function evaluateCode(userInput) {
-    // Some protections for running eval()
-    if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1) {
-        return 'undefined;' + userInput;
+    let returnObject = {
+        success: true,
+        result: ''
+    };
+
+    // Some protections for blindly feeding user input into eval()
+    if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1
+        || userInput.indexOf('eval') !== -1) {
+        returnObject.result = 'undefined;' + userInput;
+        return returnObject;
     }
 
-    // TODO error handling. What if user types in something invalid?
-    return eval(userInput);
+    try {
+        const evalResult = eval(userInput);
+        returnObject.result = evalResult;
+    } catch (e) {
+        returnObject.success = false;
+        returnObject.result = `Error while trying to execute '${userInput}'. Message: ${e.message}`;
+    }
+
+    return returnObject;
 }
 
-// document ready()
+function printResult($userInput, $consolePrompt, isError, aResult) {
+    let result = aResult;
+
+    const userInputString = $('.console-input').val();
+
+    // take the user input and dispaly as a label
+    $('.prompt-completed').clone()
+        .removeClass('prompt-completed')
+        .insertBefore($consolePrompt)
+        .find('code')
+        .text(userInputString);
+
+    // clear the user input
+    $userInput.val('');
+
+    if (isError === true) {
+        result = '<strong class = "error">' + result + '</strong>';
+    }
+
+    // print the result
+    $('.prompt-result').clone()
+      .removeClass('prompt-result')
+      .insertBefore($consolePrompt)
+      .find('code')
+      [isError ? 'html' : 'text'](result);
+}
+
+// This is the same opening line as 'document ready()'
 $(function() {
     // all custom jQuery will go here
     //  .html:              <p id="demo"></p>
     //  .js:                $("#demo").html("Hello, World!");
 
     console.log('current lesson: ' + currentLesson);
+
+    const $console = $('.console');
+    const $consolePrompt = $('.console-prompt');
+    const $userInput = $('.console-input');
+
+    // Focus on the user input box
+    $userInput.trigger('focus');
+
     if (currentLesson !== 1) {
         // hide lesson 1, which is turned on by default
         $('.lesson1').hide();
 
         startLesson(currentLesson);
     }
-
-    const $console = $('.console');
-    const $consolePrompt = $('.console-prompt');
-    const $userInput = $('.console-input');
 
     // If the user clicks anywhere in the console box, focus the cursor on the input line
     $console.on('click', function (e) {
@@ -145,11 +263,13 @@ $(function() {
         const userInputString = $('.console-input').val();
         const lowercaseUserInputString = userInputString.toLowerCase();
 
-        if (e.key === keyMap.ENTER) {
+        if (e.key === constants.keyMap.ENTER) {
+            // save the most recent command
+            mostRecentCommand = userInputString;
+            saveToLocalStorage('mostRecentCommand', userInputString);
 
             // do nothing if there is no user input
             if (userInputString.length === 0) {
-                // window.reset();
                 return;
             }
 
@@ -174,67 +294,73 @@ $(function() {
                 // TODO show the answer
             }
 
-            // take the user input and dispaly as a label
-            $('.prompt-completed').clone()
-                .removeClass('prompt-completed')
-                .insertBefore($consolePrompt)
-                .find('code')
-                .text(userInputString);
-
-            // clear the user input
-            $userInput.val('');
-
             let result = '';
             let error = true;
 
-            // check what the user entered. this code will eventually need to route to different lessons
-            if (currentLesson === 1) {
-                if (lowercaseUserInputString === 'start') {
-                    error = false;
+            const sanityCheckResult = userInputSanityCheck(currentLesson, lowercaseUserInputString)
+            result = sanityCheckResult;
 
-                    advanceLesson();
-                    // move onto the next lesson automatically. Eventually will want to put a button in place
-                } else {
-                    result = 'Please type \'start\'';
-                }
-            } else if (currentLesson === 2) {
-                // Some protections against an attack. Need to revist how dangerous running eval() is.
-                if (lowercaseUserInputString.includes('generatekeys')) {
-                    const evalResult = evaluateCode(userInputString);
-                    result = JSON.stringify(evalResult, undefined, 2);
-                    error = false;
-                    advanceLesson();
-                } else {
-                    result = 'Please type \'generateKeys()\'';
-                }
-            } else if (currentLesson === 3) {
-                if (lowercaseUserInputString.includes('sign')) {
-                    const evalResult = evaluateCode(userInputString);
+            // check what th this code will eventually need to route to different lessonse user entered
+            if (sanityCheckResult === true && currentLesson === 1) {
+                error = false;
+                result = '';
 
-                    result = JSON.stringify(evalResult.toString('hex'), undefined, 2);
+                // move onto the next lesson automatically
+                advanceLesson();
+            } else if (sanityCheckResult === true){
+                const evalResult = evaluateCode(userInputString);
+
+                if (evalResult.success === true) {
+                    result = JSON.stringify(evalResult.result, undefined, 2);
                     error = false;
                     advanceLesson();
+                } else {
+                    result = evalResult.result;
                 }
             }
 
-            if (error === true) {
-                result = '<strong class = "error">' + result + '</strong>';
-            }
-
-            // print the result
-            $('.prompt-result').clone()
-              .removeClass('prompt-result')
-              .insertBefore($consolePrompt)
-              .find('code')
-              [error ? 'html' : 'text'](result);
+            printResult($userInput, $consolePrompt, error, result);
         }
 
-        if (e.key === keyMap.UP) {
-            // TODO look at history if user presses up
+        // enter the most recent command if the user presses the up arrow
+        if (e.key === constants.keyMap.UP) {
+            if (mostRecentCommand) {
+                $userInput.val(mostRecentCommand);
+            }
         };
     });
 });
-},{"bigi":9,"bip-schnorr":13,"jquery":25,"safe-buffer":30}],2:[function(require,module,exports){
+},{"./constants":1,"./stringUtils":3,"bigi":11,"bip-schnorr":15,"jquery":27,"safe-buffer":32}],3:[function(require,module,exports){
+(function (Buffer){(function (){
+function hexEncode(aString){
+    var hex, i;
+
+    var result = "";
+    for (i=0; i< aString.length; i++) {
+        hex = aString.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+
+    return result;
+}
+
+function convertToHexBuffer(aString) {
+    const hexString = hexEncode(aString);
+    const buffer = Buffer.from(hexString, 'hex');
+    return buffer;
+}
+
+// Converts to a hex buffer of length 32
+function convertToMessageBuffer(aString) {
+    const buffer = convertToHexBuffer(aString);
+    return Buffer.concat([buffer], 32);
+}
+
+module.exports = {
+    convertToMessageBuffer
+}
+}).call(this)}).call(this,require("buffer").Buffer)
+},{"buffer":20}],4:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -744,7 +870,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"object-assign":27,"util/":5}],3:[function(require,module,exports){
+},{"object-assign":29,"util/":7}],5:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -769,14 +895,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (process,global){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1366,7 +1492,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":4,"_process":28,"inherits":3}],6:[function(require,module,exports){
+},{"./support/isBuffer":6,"_process":30,"inherits":5}],8:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -1518,7 +1644,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // (public) Constructor
 function BigInteger(a, b, c) {
   if (!(this instanceof BigInteger))
@@ -3029,7 +3155,7 @@ BigInteger.valueOf = nbv
 
 module.exports = BigInteger
 
-},{"../package.json":10}],8:[function(require,module,exports){
+},{"../package.json":12}],10:[function(require,module,exports){
 (function (Buffer){(function (){
 // FIXME: Kind of a weird way to throw exceptions, consider removing
 var assert = require('assert')
@@ -3124,14 +3250,14 @@ BigInteger.prototype.toHex = function(size) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"./bigi":7,"assert":2,"buffer":18}],9:[function(require,module,exports){
+},{"./bigi":9,"assert":4,"buffer":20}],11:[function(require,module,exports){
 var BigInteger = require('./bigi')
 
 //addons
 require('./convert')
 
 module.exports = BigInteger
-},{"./bigi":7,"./convert":8}],10:[function(require,module,exports){
+},{"./bigi":9,"./convert":10}],12:[function(require,module,exports){
 module.exports={
   "name": "bigi",
   "version": "1.4.2",
@@ -3188,7 +3314,7 @@ module.exports={
   }
 }
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
@@ -3332,7 +3458,7 @@ module.exports = {
   checkAux,
 };
 
-},{"bigi":9,"ecurve":21,"safe-buffer":30}],12:[function(require,module,exports){
+},{"bigi":11,"ecurve":23,"safe-buffer":32}],14:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const sha256 = require('js-sha256');
@@ -3355,7 +3481,7 @@ module.exports = {
   hash,
 };
 
-},{"bigi":9,"js-sha256":26,"safe-buffer":30}],13:[function(require,module,exports){
+},{"bigi":11,"js-sha256":28,"safe-buffer":32}],15:[function(require,module,exports){
 const schnorr = require('./schnorr');
 schnorr.check = require('./check');
 schnorr.convert = require('./convert');
@@ -3365,7 +3491,7 @@ schnorr.taproot = require('./taproot');
 
 module.exports = schnorr;
 
-},{"./check":11,"./convert":12,"./math":14,"./mu-sig":15,"./schnorr":16,"./taproot":17}],14:[function(require,module,exports){
+},{"./check":13,"./convert":14,"./math":16,"./mu-sig":17,"./schnorr":18,"./taproot":19}],16:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
@@ -3462,7 +3588,7 @@ module.exports = {
   randomA,
 };
 
-},{"./check":11,"./convert":12,"bigi":9,"ecurve":21,"randombytes":29,"safe-buffer":30}],15:[function(require,module,exports){
+},{"./check":13,"./convert":14,"bigi":11,"ecurve":23,"randombytes":31,"safe-buffer":32}],17:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
 const curve = ecurve.getCurveByName('secp256k1');
@@ -3596,7 +3722,7 @@ module.exports = {
   partialSigCombine,
 };
 
-},{"./check":11,"./convert":12,"./math":14,"ecurve":21,"safe-buffer":30}],16:[function(require,module,exports){
+},{"./check":13,"./convert":14,"./math":16,"ecurve":23,"safe-buffer":32}],18:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
@@ -3696,7 +3822,7 @@ module.exports = {
   batchVerify,
 };
 
-},{"./check":11,"./convert":12,"./math":14,"bigi":9,"ecurve":21,"safe-buffer":30}],17:[function(require,module,exports){
+},{"./check":13,"./convert":14,"./math":16,"bigi":11,"ecurve":23,"safe-buffer":32}],19:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
 const curve = ecurve.getCurveByName('secp256k1');
@@ -3736,7 +3862,7 @@ module.exports = {
   taprootConstruct,
 };
 
-},{"./convert":12,"./math":14,"ecurve":21,"safe-buffer":30}],18:[function(require,module,exports){
+},{"./convert":14,"./math":16,"ecurve":23,"safe-buffer":32}],20:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -5517,7 +5643,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":6,"buffer":18,"ieee754":24}],19:[function(require,module,exports){
+},{"base64-js":8,"buffer":20,"ieee754":26}],21:[function(require,module,exports){
 var assert = require('assert')
 var BigInteger = require('bigi')
 
@@ -5596,7 +5722,7 @@ Curve.prototype.validate = function (Q) {
 
 module.exports = Curve
 
-},{"./point":23,"assert":2,"bigi":9}],20:[function(require,module,exports){
+},{"./point":25,"assert":4,"bigi":11}],22:[function(require,module,exports){
 module.exports={
   "secp128r1": {
     "p": "fffffffdffffffffffffffffffffffff",
@@ -5663,7 +5789,7 @@ module.exports={
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var Point = require('./point')
 var Curve = require('./curve')
 
@@ -5675,7 +5801,7 @@ module.exports = {
   getCurveByName: getCurveByName
 }
 
-},{"./curve":19,"./names":22,"./point":23}],22:[function(require,module,exports){
+},{"./curve":21,"./names":24,"./point":25}],24:[function(require,module,exports){
 var BigInteger = require('bigi')
 
 var curves = require('./curves.json')
@@ -5698,7 +5824,7 @@ function getCurveByName (name) {
 
 module.exports = getCurveByName
 
-},{"./curve":19,"./curves.json":20,"bigi":9}],23:[function(require,module,exports){
+},{"./curve":21,"./curves.json":22,"bigi":11}],25:[function(require,module,exports){
 var assert = require('assert')
 var Buffer = require('safe-buffer').Buffer
 var BigInteger = require('bigi')
@@ -5944,7 +6070,7 @@ Point.prototype.toString = function () {
 
 module.exports = Point
 
-},{"assert":2,"bigi":9,"safe-buffer":30}],24:[function(require,module,exports){
+},{"assert":4,"bigi":11,"safe-buffer":32}],26:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -6031,7 +6157,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.6.0
  * https://jquery.com/
@@ -16914,7 +17040,7 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (process,global){(function (){
 /**
  * [js-sha256]{@link https://github.com/emn178/js-sha256}
@@ -17436,7 +17562,7 @@ return jQuery;
 })();
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":28}],27:[function(require,module,exports){
+},{"_process":30}],29:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -17528,7 +17654,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -17714,7 +17840,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (process,global){(function (){
 'use strict'
 
@@ -17768,7 +17894,7 @@ function randomBytes (size, cb) {
 }
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":28,"safe-buffer":30}],30:[function(require,module,exports){
+},{"_process":30,"safe-buffer":32}],32:[function(require,module,exports){
 /*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
@@ -17835,4 +17961,4 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":18}]},{},[1]);
+},{"buffer":20}]},{},[2]);
