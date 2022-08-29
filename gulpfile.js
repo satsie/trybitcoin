@@ -50,8 +50,14 @@ gulp.task('browser-sync', function() {
 
 });
 
+gulp.task('copy-deploy-files', function (done) {
+    gulp.src(['index.html', 'assets/*', 'build/*'], {base: '.'})
+      .pipe(gulp.dest('./deploy/'));
+    done();
+});
+
 // build and launch the app
 gulp.task('dev', gulp.series('less', 'browserify', 'browser-sync'));
 
 // just build
-gulp.task('build', gulp.series('less', 'browserify'));
+gulp.task('build', gulp.series('less', 'browserify', 'copy-deploy-files'));
