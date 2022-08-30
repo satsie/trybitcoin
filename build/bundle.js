@@ -57,25 +57,27 @@ if (Object.keys(localData).length > 0) {
 }
 
 // Hide the previous lesson page and show the next one
-function startLesson(lessonNumber) {
-    console.log('starting lesson ' + lessonNumber);
+function startLesson(newLessonNumber) {
+    // hide the current lesson
+    $('.lesson' + currentLesson).hide();
 
-    // hide the previous lesson
-    const previousLesson = lessonNumber - 1;
-    $('.lesson' + previousLesson).hide();
+    // Show the new lesson
+    $('.lesson' + newLessonNumber).show();
 
-    // Show the current lesson
-    $('.lesson' + lessonNumber).show();
+    // persist the new lesson number
+    currentLesson = newLessonNumber;
+    localStorage.setItem('currentLesson', currentLesson);
 
-    // TODO what if there is no lesson? show a 404 page or message?
+    // If there is no lesson to show, display the final page
+    if (!$('.lesson' + currentLesson).length) {
+        $('.final').show();
+    }
 }
 
 // Increment the current lesson counter, save to local storage, and call
 // startLesson() to refresh the lesson page
 function advanceLesson() {
-    ++currentLesson;
-    localStorage.setItem('currentLesson', currentLesson);
-    startLesson(currentLesson);
+    startLesson(currentLesson + 1);
 }
 
 function saveToLocalStorage(key, value) {
@@ -132,6 +134,20 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
     return {valid: true};
 }
 
+function hash(inputString) {
+    // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
+    const utf8 = new TextEncoder().encode(inputString);
+
+    return window.crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+        .map((bytes) => bytes.toString(16).padStart(2, '0'))
+        .join('');
+        return {hash: hashHex};
+    });
+}
+
+
 // sanity check the user command before sending it off to eval()
 // provides minor protection against blindly running eval() on user input, but the security
 // still needs to be revisited
@@ -141,8 +157,18 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
         lesson1: 'Please type \'start\'',
         lesson2: 'Please type \'generateKeys()\'',
         lesson3: 'Please invoke the \'signMessage\' function',
-        lesson4: 'Please invoke the \'verifySignature\' function'
+        lesson4: 'Please invoke the \'verifySignature\' function',
+        lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\''
     };
+
+    // lowercase because the input is normalized before it gets to this method
+    const expectedCommandBeginning = {
+        lesson1: 'start',
+        lesson2: 'generatekeys(',
+        lesson3: 'signmessage(',
+        lesson4: 'verifysignature(',
+        lesson5: 'hash('
+    }
 
     // It's ok if the user wants to put a semicolon at the end, but remove it to
     // make validation a little simpler
@@ -150,38 +176,25 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
         aLowercaseInputString = aLowercaseInputString.slice(0, -1);
     }
 
-    if (currentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
-        return errorResponse[`lesson${currentLesson}`];
+    if (aCurrentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
+        return errorResponse[`lesson${aCurrentLesson}`];
     }
 
     // check for the opening parenthesis in the function call because without it
-    // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`
-    // which would just return the function definition
-    switch (currentLesson) {
-        case 1:
-            if (aLowercaseInputString.startsWith('start')) {
-                return true;
-            }
-        case 2:
-            if (aLowercaseInputString.startsWith('generatekeys(')) {
-                return true;
-            }
-        case 3:
-            if (aLowercaseInputString.startsWith('signmessage(')) {
-                return true;
-            }
-        case 4:
-            if (aLowercaseInputString.startsWith('verifysignature(')) {
-                return true;
-            }
-        default:
-            return errorResponse[`lesson${currentLesson}`];
+    // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`.
+    // The former would just return the function definition
+    if (aLowercaseInputString.startsWith(expectedCommandBeginning[`lesson${aCurrentLesson}`])) {
+        return true;
+    }
+
+    if (errorResponse[`lesson${aCurrentLesson}`]) {
+        return errorResponse[`lesson${aCurrentLesson}`];
     }
 
     return false;
 }
 
-function evaluateCode(userInput) {
+async function evaluateCode(userInput) {
     let returnObject = {
         success: true,
         result: ''
@@ -195,11 +208,11 @@ function evaluateCode(userInput) {
     }
 
     try {
-        const evalResult = eval(userInput);
+        const evalResult = await eval(userInput);
         returnObject.result = evalResult;
     } catch (e) {
         returnObject.success = false;
-        returnObject.result = `Error while trying to execute '${userInput}'. Message: ${e.message}`;
+        returnObject.result = {error: `Error while trying to execute '${userInput}'. Message: ${e.message}`};
     }
 
     return returnObject;
@@ -232,6 +245,21 @@ function printResult($userInput, $consolePrompt, isError, aResult) {
       [isError ? 'html' : 'text'](result);
 }
 
+function checkResult(lessonNumber, resultToCheck) {
+    let checkedResult = resultToCheck;
+
+    if (lessonNumber === 5) {
+        console.log(resultToCheck.result.hash);
+        const cypherpunksWriteCodeHash = '42cc22190b177e5c48e32fe87c214d88eb21cac7780aad65b8b816d77cf22820';
+        if (resultToCheck.result.hash !== cypherpunksWriteCodeHash) {
+            checkedResult.success = false;
+            checkedResult.result.error = 'The hash does not match! Try running: hash(\'Cypherpunks write code\')'
+        }
+    }
+
+    return checkedResult;
+}
+
 // This is the same opening line as 'document ready()'
 $(function() {
     // all custom jQuery will go here
@@ -259,7 +287,7 @@ $(function() {
         $userInput.trigger('focus');
     });
 
-    $userInput.on('keydown', function (e) {
+    $userInput.on('keydown', async function (e) {
         const userInputString = $('.console-input').val();
         const lowercaseUserInputString = userInputString.toLowerCase();
 
@@ -290,6 +318,18 @@ $(function() {
                 return;
             }
 
+            // skip to a certain lesson. mainly for development use. The lessons build on each other
+            // and store variables from previous lessons. Skipping ahead will cause issues.
+            if (lowercaseUserInputString.startsWith('startlesson(')) {
+                const lessonNumberArray = lowercaseUserInputString.match(/\(([^()]*)\)/);
+                const newLessonNumber = parseInt(lessonNumberArray[1], 10);
+                startLesson(newLessonNumber);
+
+                // clear the user input
+                $userInput.val('');
+                return;
+            }
+
             if (lowercaseUserInputString.includes('showanswer()')) {
                 // TODO show the answer
             }
@@ -300,7 +340,6 @@ $(function() {
             const sanityCheckResult = userInputSanityCheck(currentLesson, lowercaseUserInputString)
             result = sanityCheckResult;
 
-            // check what th this code will eventually need to route to different lessonse user entered
             if (sanityCheckResult === true && currentLesson === 1) {
                 error = false;
                 result = '';
@@ -308,14 +347,15 @@ $(function() {
                 // move onto the next lesson automatically
                 advanceLesson();
             } else if (sanityCheckResult === true){
-                const evalResult = evaluateCode(userInputString);
+                const evalResult = await evaluateCode(userInputString);
 
-                if (evalResult.success === true) {
-                    result = JSON.stringify(evalResult.result, undefined, 2);
+                // The user input ran successfully, but did it evaluate to the correct answer?
+                const checkedResult = checkResult(currentLesson, evalResult);
+                result = JSON.stringify(checkedResult.result, undefined, 2);
+
+                if (checkedResult.success === true) {
                     error = false;
                     advanceLesson();
-                } else {
-                    result = evalResult.result;
                 }
             }
 

@@ -8,6 +8,8 @@ Try Bitcoin is an interactive Bitcoin tutorial inspired by and forked from [Try 
 
 This tutorial asks the user to write JavaScript and it executes the raw input using the [`eval()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) command. Allowing a user to run arbitrary code is never a good idea. Use at your own risk!
 
+Along those lines, the code in this project is for educational purposes only. Using any of this code for production, particulary anything that involves cryptographic operations, is not advised.
+
 ## Installing
 
 You will need Node (>= 0.9) and npm.

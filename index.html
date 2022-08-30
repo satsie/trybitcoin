@@ -5,7 +5,7 @@
     <title>Try Bitcoin</title>
     <link rel="stylesheet" type="text/css" href="build/reset.css">
     <link rel="stylesheet" type="text/css" href="build/main.css">
-
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.png">
 </head>
 
 <body>
@@ -52,15 +52,30 @@
                 <p>As you can see, public and private keys can be represented by strings of letters and numbers. These ones are encoded in hex.</p>
                 <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information. The public key is then used to verify the signature's authenticity.</p>
                 <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify the signature came from you.</p>
-                <p>The private key you generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>signMessage(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
+                <p>The private key that was generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>signMessage(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
             </div>
 
             <div class="lesson lesson4">
                 <p>Nice work! We've signed a message with a private key. Now we can use the corresponding public key to verify the signature's authenticity.</p>
-                <p>Type <code>verifySignature(publicKey, message, signature)</code> to verify the message created in the previous step.</p>
+                <p>Type <code>verifySignature(publicKey, message, signature)</code> to verify that the signature came from the private key we think it did.</p>
             </div>
 
             <div class="lesson lesson5">
+                <p>These digital signatures are one of the most important technical concepts in Bitcoin. Spending is actually the act of signing a message to transfer ownership of the bitcoin.</p>
+                <p>You may have heard about the importance of protecting your private keys. This is why! Anyone that has access to them can sign messages on your behalf, messages that transfer ownership (aka spend) your bitcoin.</p>
+                <p>Speaking of message signing, another essential part of Bitcoin is <strong>hashing</strong>. Hashing is kind of like creating a digital fingerprint for a piece of data. You have a one way function that returns an output of a fixed size. Just like fingerprints, hashes are unique*. You also can't reverse engineer a hash and figure out the data that was used to generate it.</p>
+                <p>Hashes are reliable in the sense that they are deterministic. You can hash the same piece of data over and over again and you'll always get the same result.</p>
+                <p>Here's an example. I've taken the phrase "Cypherpunks write code" and sent it through a hash function, that sparkly black box. Out pops a string of letters and numbers.</p>
+                <p><img class="lesson-image" src='assets/hashExample1.png'></p>
+                <p>This probably doesn't look that exciting. The resulting hash is actually longer than the phrase that was input, and it's now completely indecipherable. But what if we tried hashing something longer? What about hashing the first paragraph of the Bitcoin whitepaper?</p>
+                <p><img class="lesson-image" src='assets/hashExample2.png'></p>
+                <p>Look at that! That long paragrah has been reduced to a unique string of letters and numbers. As expected, it's totally different than the hash for "Cypherpunks write code", yet the two hashes are the same length.</p>
+                <p>You see hashes all over Bitcoin, from transaction IDs, to address creation, to scripts that define particular spending conditions. Oftentimes, a piece of information will be reduced to its hash to save space.</p>
+                <p>Let's test the deterministic property of hash functions. Type <code>hash('Cypherpunks write code')</code> to test that the hash is the same as the example above.</p>
+                <p><i>* when a hash is not unique, this is called a "hash collision"</i></p>
+            </div>
+
+            <div class="lesson final">
                 <p>That's all for now! Thank you for checking out this proof-of-concept.</p>
                 <p>Type <code>reset</code> to do it all over again.</p>
             </div>
