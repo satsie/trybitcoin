@@ -10,12 +10,47 @@ const keyMap = {
 
 exports.keyMap = keyMap;
 },{}],2:[function(require,module,exports){
+(function (Buffer){(function (){
+const stringUtils = require('./stringUtils');
+const schnorr = require('bip-schnorr');
+
+function verifySignature(aPublicKeyHex, aMessage, aSignature) {
+    const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
+    const signatureBuffer = Buffer.from(aSignature, 'hex');
+    const messageBuffer = stringUtils.convertToMessageBuffer(aMessage);
+
+    // the bip-schnorr lib will throw an error if this is not valid
+    schnorr.verify(publicKeyBuffer, messageBuffer, signatureBuffer);
+    return {valid: true};
+}
+
+function hash(inputString) {
+    // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
+    const utf8 = new TextEncoder().encode(inputString);
+
+    return window.crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+        .map((bytes) => bytes.toString(16).padStart(2, '0'))
+        .join('');
+        return {hash: hashHex};
+    });
+}
+
+module.exports = {
+    verifySignature,
+    hash
+}
+}).call(this)}).call(this,require("buffer").Buffer)
+},{"./stringUtils":4,"bip-schnorr":17,"buffer":22}],3:[function(require,module,exports){
 var $ = require('jquery');
 const Buffer = require('safe-buffer').Buffer;
 const BigInteger = require('bigi');
 const schnorr = require('bip-schnorr');
 const stringUtils = require('./stringUtils');
 const constants = require('./constants');
+const helperMethods = require('./helperMethods');
+const validation = require('./validation');
 
 let mostRecentCommand;
 let privateKey;
@@ -125,73 +160,11 @@ function signMessage(privateKeyHex, messageString) {
 }
 
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
-    const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
-    const signatureBuffer = Buffer.from(aSignature, 'hex');
-    const messageBuffer = stringUtils.convertToMessageBuffer(aMessage);
-
-    // the bip-schnorr lib will throw an error if this is not valid
-    schnorr.verify(publicKeyBuffer, messageBuffer, signatureBuffer);
-    return {valid: true};
+    return helperMethods.verifySignature(aPublicKeyHex, aMessage, aSignature);
 }
 
 function hash(inputString) {
-    // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
-    const utf8 = new TextEncoder().encode(inputString);
-
-    return window.crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-        .map((bytes) => bytes.toString(16).padStart(2, '0'))
-        .join('');
-        return {hash: hashHex};
-    });
-}
-
-
-// sanity check the user command before sending it off to eval()
-// provides minor protection against blindly running eval() on user input, but the security
-// still needs to be revisited
-// returns true if the sanity check passes
-function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
-    const errorResponse = {
-        lesson1: 'Please type \'start\'',
-        lesson2: 'Please type \'generateKeys()\'',
-        lesson3: 'Please invoke the \'signMessage\' function',
-        lesson4: 'Please invoke the \'verifySignature\' function',
-        lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\''
-    };
-
-    // lowercase because the input is normalized before it gets to this method
-    const expectedCommandBeginning = {
-        lesson1: 'start',
-        lesson2: 'generatekeys(',
-        lesson3: 'signmessage(',
-        lesson4: 'verifysignature(',
-        lesson5: 'hash('
-    }
-
-    // It's ok if the user wants to put a semicolon at the end, but remove it to
-    // make validation a little simpler
-    if (aLowercaseInputString.endsWith(';')) {
-        aLowercaseInputString = aLowercaseInputString.slice(0, -1);
-    }
-
-    if (aCurrentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
-        return errorResponse[`lesson${aCurrentLesson}`];
-    }
-
-    // check for the opening parenthesis in the function call because without it
-    // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`.
-    // The former would just return the function definition
-    if (aLowercaseInputString.startsWith(expectedCommandBeginning[`lesson${aCurrentLesson}`])) {
-        return true;
-    }
-
-    if (errorResponse[`lesson${aCurrentLesson}`]) {
-        return errorResponse[`lesson${aCurrentLesson}`];
-    }
-
-    return false;
+    return helperMethods.hash(inputString);
 }
 
 async function evaluateCode(userInput) {
@@ -243,21 +216,6 @@ function printResult($userInput, $consolePrompt, isError, aResult) {
       .insertBefore($consolePrompt)
       .find('code')
       [isError ? 'html' : 'text'](result);
-}
-
-function checkResult(lessonNumber, resultToCheck) {
-    let checkedResult = resultToCheck;
-
-    if (lessonNumber === 5) {
-        console.log(resultToCheck.result.hash);
-        const cypherpunksWriteCodeHash = '42cc22190b177e5c48e32fe87c214d88eb21cac7780aad65b8b816d77cf22820';
-        if (resultToCheck.result.hash !== cypherpunksWriteCodeHash) {
-            checkedResult.success = false;
-            checkedResult.result.error = 'The hash does not match! Try running: hash(\'Cypherpunks write code\')'
-        }
-    }
-
-    return checkedResult;
 }
 
 // This is the same opening line as 'document ready()'
@@ -337,7 +295,7 @@ $(function() {
             let result = '';
             let error = true;
 
-            const sanityCheckResult = userInputSanityCheck(currentLesson, lowercaseUserInputString)
+            const sanityCheckResult = validation.userInputSanityCheck(currentLesson, lowercaseUserInputString)
             result = sanityCheckResult;
 
             if (sanityCheckResult === true && currentLesson === 1) {
@@ -350,7 +308,7 @@ $(function() {
                 const evalResult = await evaluateCode(userInputString);
 
                 // The user input ran successfully, but did it evaluate to the correct answer?
-                const checkedResult = checkResult(currentLesson, evalResult);
+                const checkedResult = validation.checkResult(currentLesson, evalResult);
                 result = JSON.stringify(checkedResult.result, undefined, 2);
 
                 if (checkedResult.success === true) {
@@ -370,7 +328,7 @@ $(function() {
         };
     });
 });
-},{"./constants":1,"./stringUtils":3,"bigi":11,"bip-schnorr":15,"jquery":27,"safe-buffer":32}],3:[function(require,module,exports){
+},{"./constants":1,"./helperMethods":2,"./stringUtils":4,"./validation":5,"bigi":13,"bip-schnorr":17,"jquery":29,"safe-buffer":34}],4:[function(require,module,exports){
 (function (Buffer){(function (){
 function hexEncode(aString){
     var hex, i;
@@ -400,7 +358,74 @@ module.exports = {
     convertToMessageBuffer
 }
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":20}],4:[function(require,module,exports){
+},{"buffer":22}],5:[function(require,module,exports){
+
+function checkResult(lessonNumber, resultToCheck) {
+    let checkedResult = resultToCheck;
+
+    if (lessonNumber === 5) {
+        console.log(resultToCheck.result.hash);
+        const cypherpunksWriteCodeHash = '42cc22190b177e5c48e32fe87c214d88eb21cac7780aad65b8b816d77cf22820';
+        if (resultToCheck.result.hash !== cypherpunksWriteCodeHash) {
+            checkedResult.success = false;
+            checkedResult.result.error = 'The hash does not match! Try running: hash(\'Cypherpunks write code\')'
+        }
+    }
+
+    return checkedResult;
+}
+
+// sanity check the user command before sending it off to eval()
+// provides minor protection against blindly running eval() on user input, but the security
+// still needs to be revisited
+// returns true if the sanity check passes
+function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
+    const errorResponse = {
+        lesson1: 'Please type \'start\'',
+        lesson2: 'Please type \'generateKeys()\'',
+        lesson3: 'Please invoke the \'signMessage\' function',
+        lesson4: 'Please invoke the \'verifySignature\' function',
+        lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\''
+    };
+
+    // lowercase because the input is normalized before it gets to this method
+    const expectedCommandBeginning = {
+        lesson1: 'start',
+        lesson2: 'generatekeys(',
+        lesson3: 'signmessage(',
+        lesson4: 'verifysignature(',
+        lesson5: 'hash('
+    }
+
+    // It's ok if the user wants to put a semicolon at the end, but remove it to
+    // make validation a little simpler
+    if (aLowercaseInputString.endsWith(';')) {
+        aLowercaseInputString = aLowercaseInputString.slice(0, -1);
+    }
+
+    if (aCurrentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
+        return errorResponse[`lesson${aCurrentLesson}`];
+    }
+
+    // check for the opening parenthesis in the function call because without it
+    // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`.
+    // The former would just return the function definition
+    if (aLowercaseInputString.startsWith(expectedCommandBeginning[`lesson${aCurrentLesson}`])) {
+        return true;
+    }
+
+    if (errorResponse[`lesson${aCurrentLesson}`]) {
+        return errorResponse[`lesson${aCurrentLesson}`];
+    }
+
+    return false;
+}
+
+module.exports = {
+    checkResult,
+    userInputSanityCheck
+}
+},{}],6:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -910,7 +935,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"object-assign":29,"util/":7}],5:[function(require,module,exports){
+},{"object-assign":31,"util/":9}],7:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -935,14 +960,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (process,global){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1532,7 +1557,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":6,"_process":30,"inherits":5}],8:[function(require,module,exports){
+},{"./support/isBuffer":8,"_process":32,"inherits":7}],10:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -1684,7 +1709,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // (public) Constructor
 function BigInteger(a, b, c) {
   if (!(this instanceof BigInteger))
@@ -3195,7 +3220,7 @@ BigInteger.valueOf = nbv
 
 module.exports = BigInteger
 
-},{"../package.json":12}],10:[function(require,module,exports){
+},{"../package.json":14}],12:[function(require,module,exports){
 (function (Buffer){(function (){
 // FIXME: Kind of a weird way to throw exceptions, consider removing
 var assert = require('assert')
@@ -3290,14 +3315,14 @@ BigInteger.prototype.toHex = function(size) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"./bigi":9,"assert":4,"buffer":20}],11:[function(require,module,exports){
+},{"./bigi":11,"assert":6,"buffer":22}],13:[function(require,module,exports){
 var BigInteger = require('./bigi')
 
 //addons
 require('./convert')
 
 module.exports = BigInteger
-},{"./bigi":9,"./convert":10}],12:[function(require,module,exports){
+},{"./bigi":11,"./convert":12}],14:[function(require,module,exports){
 module.exports={
   "name": "bigi",
   "version": "1.4.2",
@@ -3354,7 +3379,7 @@ module.exports={
   }
 }
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
@@ -3498,7 +3523,7 @@ module.exports = {
   checkAux,
 };
 
-},{"bigi":11,"ecurve":23,"safe-buffer":32}],14:[function(require,module,exports){
+},{"bigi":13,"ecurve":25,"safe-buffer":34}],16:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const sha256 = require('js-sha256');
@@ -3521,7 +3546,7 @@ module.exports = {
   hash,
 };
 
-},{"bigi":11,"js-sha256":28,"safe-buffer":32}],15:[function(require,module,exports){
+},{"bigi":13,"js-sha256":30,"safe-buffer":34}],17:[function(require,module,exports){
 const schnorr = require('./schnorr');
 schnorr.check = require('./check');
 schnorr.convert = require('./convert');
@@ -3531,7 +3556,7 @@ schnorr.taproot = require('./taproot');
 
 module.exports = schnorr;
 
-},{"./check":13,"./convert":14,"./math":16,"./mu-sig":17,"./schnorr":18,"./taproot":19}],16:[function(require,module,exports){
+},{"./check":15,"./convert":16,"./math":18,"./mu-sig":19,"./schnorr":20,"./taproot":21}],18:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
@@ -3628,7 +3653,7 @@ module.exports = {
   randomA,
 };
 
-},{"./check":13,"./convert":14,"bigi":11,"ecurve":23,"randombytes":31,"safe-buffer":32}],17:[function(require,module,exports){
+},{"./check":15,"./convert":16,"bigi":13,"ecurve":25,"randombytes":33,"safe-buffer":34}],19:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
 const curve = ecurve.getCurveByName('secp256k1');
@@ -3762,7 +3787,7 @@ module.exports = {
   partialSigCombine,
 };
 
-},{"./check":13,"./convert":14,"./math":16,"ecurve":23,"safe-buffer":32}],18:[function(require,module,exports){
+},{"./check":15,"./convert":16,"./math":18,"ecurve":25,"safe-buffer":34}],20:[function(require,module,exports){
 const BigInteger = require('bigi');
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
@@ -3862,7 +3887,7 @@ module.exports = {
   batchVerify,
 };
 
-},{"./check":13,"./convert":14,"./math":16,"bigi":11,"ecurve":23,"safe-buffer":32}],19:[function(require,module,exports){
+},{"./check":15,"./convert":16,"./math":18,"bigi":13,"ecurve":25,"safe-buffer":34}],21:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer;
 const ecurve = require('ecurve');
 const curve = ecurve.getCurveByName('secp256k1');
@@ -3902,7 +3927,7 @@ module.exports = {
   taprootConstruct,
 };
 
-},{"./convert":14,"./math":16,"ecurve":23,"safe-buffer":32}],20:[function(require,module,exports){
+},{"./convert":16,"./math":18,"ecurve":25,"safe-buffer":34}],22:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -5683,7 +5708,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":8,"buffer":20,"ieee754":26}],21:[function(require,module,exports){
+},{"base64-js":10,"buffer":22,"ieee754":28}],23:[function(require,module,exports){
 var assert = require('assert')
 var BigInteger = require('bigi')
 
@@ -5762,7 +5787,7 @@ Curve.prototype.validate = function (Q) {
 
 module.exports = Curve
 
-},{"./point":25,"assert":4,"bigi":11}],22:[function(require,module,exports){
+},{"./point":27,"assert":6,"bigi":13}],24:[function(require,module,exports){
 module.exports={
   "secp128r1": {
     "p": "fffffffdffffffffffffffffffffffff",
@@ -5829,7 +5854,7 @@ module.exports={
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var Point = require('./point')
 var Curve = require('./curve')
 
@@ -5841,7 +5866,7 @@ module.exports = {
   getCurveByName: getCurveByName
 }
 
-},{"./curve":21,"./names":24,"./point":25}],24:[function(require,module,exports){
+},{"./curve":23,"./names":26,"./point":27}],26:[function(require,module,exports){
 var BigInteger = require('bigi')
 
 var curves = require('./curves.json')
@@ -5864,7 +5889,7 @@ function getCurveByName (name) {
 
 module.exports = getCurveByName
 
-},{"./curve":21,"./curves.json":22,"bigi":11}],25:[function(require,module,exports){
+},{"./curve":23,"./curves.json":24,"bigi":13}],27:[function(require,module,exports){
 var assert = require('assert')
 var Buffer = require('safe-buffer').Buffer
 var BigInteger = require('bigi')
@@ -6110,7 +6135,7 @@ Point.prototype.toString = function () {
 
 module.exports = Point
 
-},{"assert":4,"bigi":11,"safe-buffer":32}],26:[function(require,module,exports){
+},{"assert":6,"bigi":13,"safe-buffer":34}],28:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -6197,7 +6222,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.6.0
  * https://jquery.com/
@@ -17080,7 +17105,7 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (process,global){(function (){
 /**
  * [js-sha256]{@link https://github.com/emn178/js-sha256}
@@ -17602,7 +17627,7 @@ return jQuery;
 })();
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":30}],29:[function(require,module,exports){
+},{"_process":32}],31:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -17694,7 +17719,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -17880,7 +17905,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function (process,global){(function (){
 'use strict'
 
@@ -17934,7 +17959,7 @@ function randomBytes (size, cb) {
 }
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":30,"safe-buffer":32}],32:[function(require,module,exports){
+},{"_process":32,"safe-buffer":34}],34:[function(require,module,exports){
 /*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
@@ -18001,4 +18026,4 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":20}]},{},[2]);
+},{"buffer":22}]},{},[3]);
