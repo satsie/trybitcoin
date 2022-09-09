@@ -24,7 +24,8 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
         lesson2: 'Please type \'generateKeys()\'',
         lesson3: 'Please invoke the \'signMessage\' function',
         lesson4: 'Please invoke the \'verifySignature\' function',
-        lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\''
+        lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
+        lesson6: 'Please type \'createAddress()\''
     };
 
     // lowercase because the input is normalized before it gets to this method
@@ -33,7 +34,8 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
         lesson2: 'generatekeys(',
         lesson3: 'signmessage(',
         lesson4: 'verifysignature(',
-        lesson5: 'hash('
+        lesson5: 'hash(',
+        lesson6: 'createaddress('
     }
 
     // It's ok if the user wants to put a semicolon at the end, but remove it to

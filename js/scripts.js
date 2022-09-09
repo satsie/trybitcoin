@@ -2,10 +2,14 @@ var $ = require('jquery');
 const Buffer = require('safe-buffer').Buffer;
 const BigInteger = require('bigi');
 const schnorr = require('bip-schnorr');
+const bitcoinjs = require('bitcoinjs-lib');
+const ecc = require('tiny-secp256k1');
 const stringUtils = require('./stringUtils');
 const constants = require('./constants');
 const helperMethods = require('./helperMethods');
 const validation = require('./validation');
+
+const bip32 = BIP32Wrapper(ecc);
 
 let mostRecentCommand;
 let privateKey;
@@ -120,6 +124,11 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
 
 function hash(inputString) {
     return helperMethods.hash(inputString);
+}
+
+function createAddress() {
+
+    // TODO
 }
 
 async function evaluateCode(userInput) {

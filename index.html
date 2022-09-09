@@ -61,6 +61,7 @@
             </div>
 
             <div class="lesson lesson5">
+                <h2>Hashing</h2>
                 <p>These digital signatures are one of the most important technical concepts in Bitcoin. Spending is actually the act of signing a message to transfer ownership of the bitcoin.</p>
                 <p>You may have heard about the importance of protecting your private keys. This is why! Anyone that has access to them can sign messages on your behalf, messages that transfer ownership (aka spend) your bitcoin.</p>
                 <p>Speaking of message signing, another essential part of Bitcoin is <strong>hashing</strong>. Hashing is kind of like creating a digital fingerprint for a piece of data. You have a one way function that returns an output of a fixed size. Just like fingerprints, hashes are unique*. You also can't reverse engineer a hash and figure out the data that was used to generate it.</p>
@@ -75,6 +76,15 @@
                 <p><i>* when a hash is not unique, this is called a "hash collision"</i></p>
             </div>
 
+            <div class="lesson lesson6">
+                <h2>Addresses</h2>
+                <p>Now that we know about public/private keypairs and hashing, we can learn what it means to receive bitcoin. When you want someone to send you bitcoin, you provide an <strong>address</strong>.</p>
+                <p>This is what one looks like: <code>2NEwkTybLpYyaRooBFMXAJDtchRdA8FMM4G</code></p>
+                <p>At this point it's probably unsurprising that it looks like a random string of letters and numbers, but it's actually a hash!</p>
+                <p>Addresses are derived from public keys. For advanced applications, you can create an address from a script that contains one or more public keys.</p>
+                <p>We know from the previous lesson that you cannot go backwards with hashes. So if someone gives you an address, you cannot reverse engineer the public key(s) that were used to create it.</p>
+                <p>Try generating an address for yourself! Type <code>createAddress()</code> in the console.</p>
+            </div>
             <div class="lesson final">
                 <h2>That's all for now!</h2>
                 <p>Thank you for checking out this proof-of-concept. If you wish to do it again, you can use the <code>reset</code> command.</p>
