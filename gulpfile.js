@@ -4,6 +4,7 @@ const source = require('vinyl-source-stream');
 const browserSync = require('browser-sync').create();
 const plugins = require('gulp-load-plugins')();
 var through = require('through2');
+var babel = require('babelify');
 
 var lessConfig = {
     buildDir: 'build',
@@ -26,6 +27,7 @@ gulp.task('less', function () {
 // Browserify basically allows the code to use npm modules
 gulp.task('browserify', function() {
     return browserify('js/scripts.js')
+        .transform(babel)
         .bundle()
         //Pass desired output filename to vinyl-source-stream
         // This is the file that index.js is looking for

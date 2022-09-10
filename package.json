@@ -9,10 +9,10 @@
     "bitcoinjs-lib": "^6.0.2",
     "jquery": "^3.6.0",
     "less": "^4.1.3",
-    "safe-buffer": "^5.2.1",
-    "tiny-secp256k1": "^2.2.1"
+    "safe-buffer": "^5.2.1"
   },
   "devDependencies": {
+    "babelify": "^10.0.0",
     "browser-sync": "^2.27.10",
     "browserify": "^17.0.0",
     "gulp": "^4.0.2",

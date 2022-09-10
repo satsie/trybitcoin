@@ -82,9 +82,26 @@
                 <p>This is what one looks like: <code>2NEwkTybLpYyaRooBFMXAJDtchRdA8FMM4G</code></p>
                 <p>At this point it's probably unsurprising that it looks like a random string of letters and numbers, but it's actually a hash!</p>
                 <p>Addresses are derived from public keys. For advanced applications, you can create an address from a script that contains one or more public keys.</p>
-                <p>We know from the previous lesson that you cannot go backwards with hashes. So if someone gives you an address, you cannot reverse engineer the public key(s) that were used to create it.</p>
-                <p>Try generating an address for yourself! Type <code>createAddress()</code> in the console.</p>
+                <p>We know from the previous lesson that you cannot go backwards with hashes. So if someone gives you an address, you cannot reverse engineer the public key, or keys that were used to create it.</p>
+                <p>Try generating an address for yourself! Type <code>createAddress(publicKey)</code> in the console.</p>
             </div>
+
+            <!-- TODO: move onto explaining transactions and the UTXO model
+                lesson 7: Make a diagram of a bitcoin transaction, what it would look like
+                if Alice had 10 bitcoin and sent you 1
+
+                simulate some kind of "gettxhistory" call (what does bitcoin core wallet RPC do?)
+                that includes the hypothetical transaction just described
+
+                Then, for lesson 8, simulate a few more receives. Use this to explain coin control.
+                Explain transaction signing, show unsigned tx, have user sign, and show the signed tx
+
+                lesson 9 broadcast. Explain confirmed/unconfirmed
+
+                lesson 10 tx has confirmed, look at tx history? or balance?
+
+                Potential future routes: the mempool, mining. "a bitcoin journey" from a wallet to a block
+            -->
             <div class="lesson final">
                 <h2>That's all for now!</h2>
                 <p>Thank you for checking out this proof-of-concept. If you wish to do it again, you can use the <code>reset</code> command.</p>

@@ -3,13 +3,10 @@ const Buffer = require('safe-buffer').Buffer;
 const BigInteger = require('bigi');
 const schnorr = require('bip-schnorr');
 const bitcoinjs = require('bitcoinjs-lib');
-const ecc = require('tiny-secp256k1');
 const stringUtils = require('./stringUtils');
 const constants = require('./constants');
 const helperMethods = require('./helperMethods');
 const validation = require('./validation');
-
-const bip32 = BIP32Wrapper(ecc);
 
 let mostRecentCommand;
 let privateKey;
@@ -106,7 +103,7 @@ function signMessage(privateKeyHex, messageString) {
     message = messageString;
 
     // bip-schnorr lib requires the message to be 32 bytes
-    const messageBuffer = stringUtils.convertToMessageBuffer(message);
+    const messageBuffer = stringUtils.convertToFixedBuffer(message, 32);
 
     const schnorrSig = schnorr.sign(privateKeyHex, messageBuffer);
     const schnorrSigHex = schnorrSig.toString('hex');
@@ -115,7 +112,7 @@ function signMessage(privateKeyHex, messageString) {
     saveToLocalStorage('signature', schnorrSigHex);
     signature = schnorrSigHex;
 
-    return {signature: schnorrSigHex};
+    return {message: messageString, signature: schnorrSigHex};
 }
 
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
@@ -126,9 +123,25 @@ function hash(inputString) {
     return helperMethods.hash(inputString);
 }
 
-function createAddress() {
+// The fact that this accepts an address is misleading. Since we can't use 32 byte Schnorr
+// friendly keys (see below), we just throw away whatever the user provides. The parameter
+// is here to make the user feel like they are passing in a pub key, since one is required
+// for address creation.
+function createAddress(aPublicKey) {
+    // want to make a taproot address, but that requires the tiny-secp256k1 lib which
+    // uses WASM. Couldn't find a way to add WASM support with Gulp. It appears do-able
+    // with Webpack, but that's going to require some effot.
+    // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1746#issuecomment-968371375
+    // https://github.com/bitcoinjs/tiny-secp256k1/blob/master/examples/react-app/webpack.config.js
 
-    // TODO
+    // For now, create the address with a (new) EC keypair. Keypair is hardcoded because in order
+    // to randomize it we'd need the same tiny-secp256k1 lib mentioned above
+    const ecPublicKey = '03c94e02d923a42bf6011f55ec52580c1ca4bbee5d7aeccf7aa8adc62d93478130';
+    // just in case this is needed later
+    const ecPrivateKey = 'd827067318c514f1ff19db230f285fb5f49995a850bbb7a24545eac57957fbb6';
+
+    const { address } = bitcoinjs.payments.p2pkh({ pubkey: Buffer.from(ecPublicKey, 'hex') });
+    return {address};
 }
 
 async function evaluateCode(userInput) {

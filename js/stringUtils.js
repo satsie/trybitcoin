@@ -17,11 +17,11 @@ function convertToHexBuffer(aString) {
 }
 
 // Converts to a hex buffer of length 32
-function convertToMessageBuffer(aString) {
+function convertToFixedBuffer(aString, size) {
     const buffer = convertToHexBuffer(aString);
-    return Buffer.concat([buffer], 32);
+    return Buffer.concat([buffer], size);
 }
 
 module.exports = {
-    convertToMessageBuffer
+    convertToFixedBuffer
 }

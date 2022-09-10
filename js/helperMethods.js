@@ -4,7 +4,7 @@ const schnorr = require('bip-schnorr');
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
     const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
     const signatureBuffer = Buffer.from(aSignature, 'hex');
-    const messageBuffer = stringUtils.convertToMessageBuffer(aMessage);
+    const messageBuffer = stringUtils.convertToFixedBuffer(aMessage, 32);
 
     // the bip-schnorr lib will throw an error if this is not valid
     schnorr.verify(publicKeyBuffer, messageBuffer, signatureBuffer);
