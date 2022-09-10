@@ -53,8 +53,6 @@ var $ = require('jquery');
 
 const Buffer = require('safe-buffer').Buffer;
 
-const BigInteger = require('bigi');
-
 const schnorr = require('bip-schnorr');
 
 const bitcoinjs = require('bitcoinjs-lib');
@@ -342,7 +340,7 @@ $(function () {
   });
 });
 
-},{"./constants":1,"./helperMethods":2,"./stringUtils":4,"./validation":5,"bigi":15,"bip-schnorr":19,"bitcoinjs-lib":59,"jquery":111,"safe-buffer":160}],4:[function(require,module,exports){
+},{"./constants":1,"./helperMethods":2,"./stringUtils":4,"./validation":5,"bip-schnorr":19,"bitcoinjs-lib":59,"jquery":111,"safe-buffer":160}],4:[function(require,module,exports){
 (function (Buffer){(function (){
 function hexEncode(aString) {
   var hex, i;
