@@ -1,6 +1,5 @@
 var $ = require('jquery');
 const Buffer = require('safe-buffer').Buffer;
-const BigInteger = require('bigi');
 const schnorr = require('bip-schnorr');
 const bitcoinjs = require('bitcoinjs-lib');
 const stringUtils = require('./stringUtils');
