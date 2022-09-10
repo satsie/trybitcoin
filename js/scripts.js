@@ -120,7 +120,7 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
 }
 
 function hash(inputString) {
-    return helperMethods.hash(window.crypto.subtle, inputString);
+    return helperMethods.hash(inputString);
 }
 
 // The fact that this accepts an address is misleading. Since we can't use 32 byte Schnorr

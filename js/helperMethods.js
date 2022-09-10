@@ -1,5 +1,6 @@
 const stringUtils = require('./stringUtils');
 const schnorr = require('bip-schnorr');
+const forge = require('node-forge');
 
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
     const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
@@ -11,17 +12,18 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
     return {valid: true};
 }
 
-function hash(subtleCrypto, inputString) {
+function hash(inputString) {
     // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
     const utf8 = new TextEncoder().encode(inputString);
 
-    return subtleCrypto.digest('SHA-256', utf8).then((hashBuffer) => {
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-        .map((bytes) => bytes.toString(16).padStart(2, '0'))
-        .join('');
-        return {hash: hashHex};
-    });
+    // Using forge because window.crypto.subtle (subtle crypto) is restricted to secure origins,
+    // aka https or localhost. Planning to move to https but that is going to require some updates
+    // to the CD pipeline.
+    let md = forge.md.sha256.create();
+    md.update(Buffer.from(utf8, 'utf-8'));
+    const hashHex = md.digest().toHex();
+
+    return {hash: hashHex};
 }
 
 module.exports = {
