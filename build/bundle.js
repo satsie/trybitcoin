@@ -26,10 +26,10 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
   };
 }
 
-function hash(inputString) {
+function hash(subtleCrypto, inputString) {
   // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
   const utf8 = new TextEncoder().encode(inputString);
-  return window.crypto.subtle.digest('SHA-256', utf8).then(hashBuffer => {
+  return subtleCrypto.digest('SHA-256', utf8).then(hashBuffer => {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(bytes => bytes.toString(16).padStart(2, '0')).join('');
     return {
@@ -171,7 +171,7 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
 }
 
 function hash(inputString) {
-  return helperMethods.hash(inputString);
+  return helperMethods.hash(window.crypto.subtle, inputString);
 } // The fact that this accepts an address is misleading. Since we can't use 32 byte Schnorr
 // friendly keys (see below), we just throw away whatever the user provides. The parameter
 // is here to make the user feel like they are passing in a pub key, since one is required

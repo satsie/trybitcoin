@@ -11,11 +11,11 @@ function verifySignature(aPublicKeyHex, aMessage, aSignature) {
     return {valid: true};
 }
 
-function hash(inputString) {
+function hash(subtleCrypto, inputString) {
     // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
     const utf8 = new TextEncoder().encode(inputString);
 
-    return window.crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+    return subtleCrypto.digest('SHA-256', utf8).then((hashBuffer) => {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray
         .map((bytes) => bytes.toString(16).padStart(2, '0'))
