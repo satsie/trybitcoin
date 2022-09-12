@@ -78,22 +78,34 @@
 
             <div class="lesson lesson6">
                 <h2>Addresses</h2>
-                <p>Now that we know about public/private keypairs and hashing, we can learn what it means to receive bitcoin. When you want someone to send you bitcoin, you provide an <strong>address</strong>.</p>
-                <p>This is what one looks like: <code>2NEwkTybLpYyaRooBFMXAJDtchRdA8FMM4G</code></p>
-                <p>At this point it's probably unsurprising that it looks like a random string of letters and numbers, but it's actually a hash!</p>
-                <p>Addresses are derived from public keys. For advanced applications, you can create an address from a script that contains one or more public keys.</p>
+                <p>Now that we know about public/private keypairs and hashing, we can learn what it means to receive bitcoin. When you want someone to send you bitcoin, you provide a receiving <strong>address</strong>.</p>
+                <p>Here's what one looks like: <code>2NEwkTybLpYyaRooBFMXAJDtchRdA8FMM4G</code></p>
+                <p>Yes, another random looking string of letters and numbers... but this time it's actually a hash!</p>
+                <p>Addresses come from from public keys. For advanced applications, you can create an address from a script that contains one or more public keys.</p>
                 <p>We know from the previous lesson that you cannot go backwards with hashes. So if someone gives you an address, you cannot reverse engineer the public key, or keys that were used to create it.</p>
-                <p>Try generating an address for yourself! Type <code>createAddress(publicKey)</code> in the console.</p>
+                <p>Try generating an address for yourself! Type <code>createAddress(publicKey)</code> to invoke the <code>createAddress()</code> function with your public key.</p>
+            </div>
+
+            <div class="lesson lesson7">
+                <h2>Transactions and coins</h2>
+                <p>The movement of bitcoin is tracked by <strong>transactions</strong>. If Alice has one bitcoin and wants to send it to you, the transaction would look something like this:</p>
+                <p><img class="lesson-image" src='assets/transactionExample1.png'></p>
+                <p>Transactions are divided into two parts, the <strong>input</strong> and <strong>output</strong>.</p>
+                <p>This is similar to double entry bookkeeping, a practice popular with Italian merchants in the 14th century. These ledgers had two columns, one for debits and one for credits. The input part of the transaction is like the "debit" column and the output part is like the "credit" column.</p>
+                <p><img class="lesson-image" src='assets/doubleEntryBookkeeping.jpg'></p>
+                <p><center><em>Source: Christopher Watrous' account book, Debits and Credits for Vincent Stillwill accounts, Durham, Connecticut, 1817</em></center></p>
+                <p>In our example there is only one input (Alice's one bitcoin) and one output (now your bitcoin). What if Alice had 10 bitcoin? If she only wants to give you one, she must specify the remaining 9 will be returned as change. Here's what that transaction looks like:</p>
+                <p><img class="lesson-image" src='assets/transactionExample2.png'></p>
+                <p>If Alice didn't specify that she wanted change back, the remaining 9 bitcoin would go to people we call miners (more on that later)! </p>
+                <p>As you see, this transaction has one input and two outputs. Inputs and outputs are very much like dollar bills. They can't be broken up without a transaction. If Alice only has a $10 bill and wants to give you $1, she can't make change on her own. She can't rip off 1/10th of the bill and give it to you. She needs to create a transaction and provide the $10 bill as the input.</p>
+                <p>Things start to differ from traditional (fiat) money when we look at denominations. In Bitcoin, you can have a "bill" in any denomination. So Alice would actually recieve a $9 bill back as change.</p>
+                <p>Inputs and outputs (aka Alice's 10 bitcoin input, her 9 bitcoin change, and your 1 bitcoin) are often referred to as <strong>coins</strong>. It seems like a simple, straightforward term, but remember that a "coin" is any denomination of bitcoin. It doesn't have to be 1 bitcoin. It can be 21 bitcoin, or fractions of a bitcoin like 0.1. You'll hear "coin" used a lot in the context of privacy.</p>
+                <p>The reference implementation of Bitcoin is a client called <a href="https://bitcoincore.org/" target="_blank">Bitcoin Core</a>. Bitcoin Core has a bunch of <a href="https://en.wikipedia.org/wiki/Remote_procedure_call" target="_blank">RPC</a> commands you can use to manage your bitcoin. Let's try the <code>getbalance</code> command to see the 1 bitcoin that Alice sent you. Type <code>bitcoin-cli getbalance</code> into the console.</p>
             </div>
 
             <!-- TODO: move onto explaining transactions and the UTXO model
-                lesson 7: Make a diagram of a bitcoin transaction, what it would look like
-                if Alice had 10 bitcoin and sent you 1
 
-                simulate some kind of "gettxhistory" call (what does bitcoin core wallet RPC do?)
-                that includes the hypothetical transaction just described
-
-                Then, for lesson 8, simulate a few more receives. Use this to explain coin control.
+                For lesson 8, simulate a few more receives. Use this to explain coin control.
                 Explain transaction signing, show unsigned tx, have user sign, and show the signed tx
 
                 lesson 9 broadcast. Explain confirmed/unconfirmed

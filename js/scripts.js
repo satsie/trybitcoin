@@ -143,11 +143,16 @@ function createAddress(aPublicKey) {
     return {address};
 }
 
-async function evaluateCode(userInput) {
+async function evaluateCode(userInput, lessonNumber) {
     let returnObject = {
         success: true,
         result: ''
     };
+
+    // If this is not a JavaScript lesson, this is a bitcoin-cli lesson
+    if (validation.bitcoinRpcLessons.includes(lessonNumber)) {
+        return evaluateBitcoinRPC(userInput, lessonNumber);
+    }
 
     // Some protections for blindly feeding user input into eval()
     if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1
@@ -165,6 +170,33 @@ async function evaluateCode(userInput) {
     }
 
     return returnObject;
+}
+
+// Mock bitcoin-cli commands. At the moment there are no plans to do anything more involved
+// than this (like running a regtest Docker container)
+function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
+    const expectedInput = {
+        7: 'bitcoin-cli getbalance'
+    };
+
+    const lessonAnswers = {
+        7: "1.00000000"
+    }
+
+    if (expectedInput[lessonNumber] === userInputCommand) {
+        return {
+            success: true,
+            result: lessonAnswers[lessonNumber]
+        };
+    }
+
+    return {
+        success: false,
+        result: {
+            error: `Error trying to execute Bitcoin Core RPC command. Please type '${expectedInput[lessonNumber]}' exactly`
+        }
+    };
+
 }
 
 function printResult($userInput, $consolePrompt, isError, aResult) {
@@ -274,6 +306,7 @@ $(function() {
             const sanityCheckResult = validation.userInputSanityCheck(currentLesson, lowercaseUserInputString)
             result = sanityCheckResult;
 
+            // Special case for lesson 1
             if (sanityCheckResult === true && currentLesson === 1) {
                 error = false;
                 result = '';
@@ -281,7 +314,7 @@ $(function() {
                 // move onto the next lesson automatically
                 advanceLesson();
             } else if (sanityCheckResult === true){
-                const evalResult = await evaluateCode(userInputString);
+                const evalResult = await evaluateCode(userInputString, currentLesson);
 
                 // The user input ran successfully, but did it evaluate to the correct answer?
                 const checkedResult = validation.checkResult(currentLesson, evalResult);

@@ -201,11 +201,16 @@ function createAddress(aPublicKey) {
   };
 }
 
-async function evaluateCode(userInput) {
+async function evaluateCode(userInput, lessonNumber) {
   let returnObject = {
     success: true,
     result: ''
-  }; // Some protections for blindly feeding user input into eval()
+  }; // If this is not a JavaScript lesson, this is a bitcoin-cli lesson
+
+  if (validation.bitcoinRpcLessons.includes(lessonNumber)) {
+    return evaluateBitcoinRPC(userInput, lessonNumber);
+  } // Some protections for blindly feeding user input into eval()
+
 
   if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1 || userInput.indexOf('eval') !== -1) {
     returnObject.result = 'undefined;' + userInput;
@@ -223,6 +228,31 @@ async function evaluateCode(userInput) {
   }
 
   return returnObject;
+} // Mock bitcoin-cli commands. At the moment there are no plans to do anything more involved
+// than this (like running a regtest Docker container)
+
+
+function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
+  const expectedInput = {
+    7: 'bitcoin-cli getbalance'
+  };
+  const lessonAnswers = {
+    7: "1.00000000"
+  };
+
+  if (expectedInput[lessonNumber] === userInputCommand) {
+    return {
+      success: true,
+      result: lessonAnswers[lessonNumber]
+    };
+  }
+
+  return {
+    success: false,
+    result: {
+      error: `Error trying to execute Bitcoin Core RPC command. Please type '${expectedInput[lessonNumber]}' exactly`
+    }
+  };
 }
 
 function printResult($userInput, $consolePrompt, isError, aResult) {
@@ -307,7 +337,7 @@ $(function () {
       let result = '';
       let error = true;
       const sanityCheckResult = validation.userInputSanityCheck(currentLesson, lowercaseUserInputString);
-      result = sanityCheckResult;
+      result = sanityCheckResult; // Special case for lesson 1
 
       if (sanityCheckResult === true && currentLesson === 1) {
         error = false;
@@ -315,7 +345,7 @@ $(function () {
 
         advanceLesson();
       } else if (sanityCheckResult === true) {
-        const evalResult = await evaluateCode(userInputString); // The user input ran successfully, but did it evaluate to the correct answer?
+        const evalResult = await evaluateCode(userInputString, currentLesson); // The user input ran successfully, but did it evaluate to the correct answer?
 
         const checkedResult = validation.checkResult(currentLesson, evalResult);
         result = JSON.stringify(checkedResult.result, undefined, 2);
@@ -372,6 +402,10 @@ module.exports = {
 
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"buffer":83}],5:[function(require,module,exports){
+// The lessons that expect the user to input JavaScript
+const javaScriptLessons = [2, 3, 4, 5, 6];
+const bitcoinRpcLessons = [7];
+
 function checkResult(lessonNumber, resultToCheck) {
   let checkedResult = resultToCheck;
 
@@ -399,7 +433,8 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson3: 'Please invoke the \'signMessage\' function',
     lesson4: 'Please invoke the \'verifySignature\' function',
     lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
-    lesson6: 'Please type \'createAddress()\''
+    lesson6: 'Please type \'createAddress()\'',
+    lesson7: 'Please type \'bitcoin-cli getbalance\''
   }; // lowercase because the input is normalized before it gets to this method
 
   const expectedCommandBeginning = {
@@ -408,19 +443,22 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson3: 'signmessage(',
     lesson4: 'verifysignature(',
     lesson5: 'hash(',
-    lesson6: 'createaddress('
+    lesson6: 'createaddress(',
+    lesson7: 'bitcoin-cli getbalance'
   }; // It's ok if the user wants to put a semicolon at the end, but remove it to
   // make validation a little simpler
 
   if (aLowercaseInputString.endsWith(';')) {
     aLowercaseInputString = aLowercaseInputString.slice(0, -1);
-  }
+  } // If this is a javascript lesson, check that the user input ends with a closing parenthesis
 
-  if (aCurrentLesson !== 1 && !aLowercaseInputString.endsWith(')')) {
+
+  if (javaScriptLessons.includes(aCurrentLesson) && !aLowercaseInputString.endsWith(')')) {
     return errorResponse[`lesson${aCurrentLesson}`];
-  } // check for the opening parenthesis in the function call because without it
-  // the user could essentially invoke `eval(myFunction)` instead of `eval(myFunction())`.
-  // The former would just return the function definition
+  } // check the beginning of the user input. For javascript commands this makes sure
+  // that there is an opening parenthesis. Without parenthesis, the user could invoke
+  // `eval(myFunction)` instead of `eval(myFunction())`. The former would just return
+  // the function definition instead of the evaulation
 
 
   if (aLowercaseInputString.startsWith(expectedCommandBeginning[`lesson${aCurrentLesson}`])) {
@@ -435,7 +473,9 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
 }
 
 module.exports = {
+  bitcoinRpcLessons,
   checkResult,
+  javaScriptLessons,
   userInputSanityCheck
 };
 
