@@ -12,6 +12,8 @@ let privateKey;
 let publicKey;
 let message;
 let signature;
+// For lesson 8
+let transaction = helperMethods.mockTxToSign;
 
 // store the lesson number in local storage so the user can leave and come back
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
@@ -143,6 +145,14 @@ function createAddress(aPublicKey) {
     return {address};
 }
 
+// This is not actually signing a transaction, but it would be cool to implement in a future version
+function signTransaction(privateKeyHex, transactionToSign) {
+    transactionToSign.inputs[0].scriptSig = "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef";
+    transactionToSign.inputs[1].scriptSig = "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3";
+
+    return {transaction: transactionToSign};
+}
+
 async function evaluateCode(userInput, lessonNumber) {
     let returnObject = {
         success: true,
@@ -232,7 +242,8 @@ $(function() {
     //  .html:              <p id="demo"></p>
     //  .js:                $("#demo").html("Hello, World!");
 
-    console.log('current lesson: ' + currentLesson);
+    // Fill in the JSON for lesson 8
+    $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
 
     const $console = $('.console');
     const $consolePrompt = $('.console-prompt');
@@ -281,6 +292,13 @@ $(function() {
 
                 // clear the rest of the data stored locally
                 localStorage.setItem('localData', {});
+
+                // Reset the mock transaction for lesson 8. Can move this into a
+                // generalized reset method in case other lesson data needs to be
+                // cleaned up
+                transaction.inputs[0].scriptSig = "";
+                transaction.inputs[1].scriptSig = "";
+
                 return;
             }
 

@@ -15,7 +15,29 @@ const stringUtils = require('./stringUtils');
 
 const schnorr = require('bip-schnorr');
 
-const forge = require('node-forge');
+const forge = require('node-forge'); // "asm": "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef",
+// "asm": "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3",
+// This is an extremely simplified example of what a transaction looks like.
+// so many fields have been removed, and some have even been changed to accomodate
+// a beginner audience (i.e. vin => inputs). This is NOT canonical!!!!
+
+
+let mockTxToSign = {
+  "inputs": [{
+    "address": "14wiw5uGiZtFNqmwEfDZJM8k2qzxxd9fS5",
+    "scriptSig": ""
+  }, {
+    "address": "1w2f2SMHjPFXFrxaj2gvYnMDnM79ybPWL",
+    "scriptSig": ""
+  }],
+  "outputs": [{
+    "value": 1.50000000,
+    "address": "1AGUB3hAXyQdCwy5ddLcyMFN8kY2qPiEMg"
+  }, {
+    "value": 0.50000000,
+    "address": "14wiw5uGiZtFNqmwEfDZJM8k2qzxxd9fS5"
+  }]
+};
 
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
   const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
@@ -44,7 +66,8 @@ function hash(inputString) {
 
 module.exports = {
   verifySignature,
-  hash
+  hash,
+  mockTxToSign
 };
 
 }).call(this)}).call(this,require("buffer").Buffer)
@@ -69,7 +92,9 @@ let mostRecentCommand;
 let privateKey;
 let publicKey;
 let message;
-let signature; // store the lesson number in local storage so the user can leave and come back
+let signature; // For lesson 8
+
+let transaction = helperMethods.mockTxToSign; // store the lesson number in local storage so the user can leave and come back
 
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
 let localDataString = localStorage.getItem('localData') || '';
@@ -199,6 +224,15 @@ function createAddress(aPublicKey) {
   return {
     address
   };
+} // This is not actually signing a transaction, but it would be cool to implement in a future version
+
+
+function signTransaction(privateKeyHex, transactionToSign) {
+  transactionToSign.inputs[0].scriptSig = "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef";
+  transactionToSign.inputs[1].scriptSig = "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3";
+  return {
+    transaction: transactionToSign
+  };
 }
 
 async function evaluateCode(userInput, lessonNumber) {
@@ -276,7 +310,8 @@ $(function () {
   // all custom jQuery will go here
   //  .html:              <p id="demo"></p>
   //  .js:                $("#demo").html("Hello, World!");
-  console.log('current lesson: ' + currentLesson);
+  // Fill in the JSON for lesson 8
+  $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
   const $console = $('.console');
   const $consolePrompt = $('.console-prompt');
   const $userInput = $('.console-input'); // Focus on the user input box
@@ -316,7 +351,12 @@ $(function () {
 
         $userInput.val(''); // clear the rest of the data stored locally
 
-        localStorage.setItem('localData', {});
+        localStorage.setItem('localData', {}); // Reset the mock transaction for lesson 8. Can move this into a
+        // generalized reset method in case other lesson data needs to be
+        // cleaned up
+
+        transaction.inputs[0].scriptSig = "";
+        transaction.inputs[1].scriptSig = "";
         return;
       } // skip to a certain lesson. mainly for development use. The lessons build on each other
       // and store variables from previous lessons. Skipping ahead will cause issues.
@@ -403,7 +443,7 @@ module.exports = {
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"buffer":83}],5:[function(require,module,exports){
 // The lessons that expect the user to input JavaScript
-const javaScriptLessons = [2, 3, 4, 5, 6];
+const javaScriptLessons = [2, 3, 4, 5, 6, 8];
 const bitcoinRpcLessons = [7];
 
 function checkResult(lessonNumber, resultToCheck) {
@@ -434,7 +474,8 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson4: 'Please invoke the \'verifySignature\' function',
     lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
     lesson6: 'Please type \'createAddress()\'',
-    lesson7: 'Please type \'bitcoin-cli getbalance\''
+    lesson7: 'Please type \'bitcoin-cli getbalance\'',
+    lesson8: 'Please type \'signTransaction(privateKey, transaction)\''
   }; // lowercase because the input is normalized before it gets to this method
 
   const expectedCommandBeginning = {
@@ -444,7 +485,8 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson4: 'verifysignature(',
     lesson5: 'hash(',
     lesson6: 'createaddress(',
-    lesson7: 'bitcoin-cli getbalance'
+    lesson7: 'bitcoin-cli getbalance',
+    lesson8: 'signtransaction('
   }; // It's ok if the user wants to put a semicolon at the end, but remove it to
   // make validation a little simpler
 

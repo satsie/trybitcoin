@@ -103,12 +103,23 @@
                 <p>The reference implementation of Bitcoin is a client called <a href="https://bitcoincore.org/" target="_blank">Bitcoin Core</a>. Bitcoin Core has a bunch of <a href="https://en.wikipedia.org/wiki/Remote_procedure_call" target="_blank">RPC</a> commands you can use to manage your bitcoin. Let's try the <code>getbalance</code> command to see the 1 bitcoin that Alice sent you. Type <code>bitcoin-cli getbalance</code> into the console.</p>
             </div>
 
-            <!-- TODO: move onto explaining transactions and the UTXO model
+            <div class="lesson lesson8">
+                <h2>Transaction Signing</h2>
+                <p>Let's pretend Bob also sends you 1 bitcoin. For privacy reasons, address reuse is not advised. Since Alice sent bitcoin to the address you generated earlier, you create a new one to give to Bob. <em>The details on how you can generate a range of addreses is outside the scope of this tutorial. You can learn more by checking out <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki" target="_blank">BIP 32</a></em>.</p>
+                <p>Now you have 2 bitcoin and you'd like to purchase something from your friend Hal for 1.5 bitcoin. You do this by creating a transaction like this:</p>
+                <p><img class="lesson-image" src='assets/transactionExample3.png'></p>
+                <p>The two inputs are the bitcoin you received from Alice and Bob. The first output sends 1.5 bitcoin to Hal, and the second returns the 0.5 bitcoin change back to you, to a new address that you generate.</p>
+                <p>This transaction is almost good to go, except for one very important step! Earlier we learned that in order to spend bitcoin, you must sign a message that authorizes the transfer of funds. This is how you prevent others from spending your bitcoin. The message that you sign is actually the transaction! In previous examples both Alice and Bob had to sign their transactions when they sent you bitcoin.</p>
+                <p>Transactions have a special area where the spender adds their digital signature. This field is named <strong><code>scriptSig</code></strong>, though there are lots of special cases and rules for it that we won't cover in this lesson. For now, all we need to remember is that signatures go in the scriptSig field, and transactions aren't complete until they are signed.</p>
+                <p>Below, we have the raw data for our transaction. We can see the two scriptSig fields (one for each input) are empty:</p>
+                <pre><p id="lesson8UnsignedTx"></p></pre>
+                <p>If we tried to broadcast this transaction out to the Bitcoin network as-is, it would be rejected. So, we must sign the transaction. We'll call the <code>signTransaction()</code> function for this. It's similar to the <code>signMessage()</code> method we called earlier, but instead of using anything we want for the message, it accepts a transaction and creates the appropriate number of signatures. It generates one signature one for each input. The raw transaction we looked at has been saved to the <code>transaction</code> variable. Type <code>signTransaction(privateKey, transaction)</code> into the console to sign the transaction.</p>
+            </div>
 
-                For lesson 8, simulate a few more receives. Use this to explain coin control.
-                Explain transaction signing, show unsigned tx, have user sign, and show the signed tx
 
-                lesson 9 broadcast. Explain confirmed/unconfirmed
+            <!-- TODO: 
+
+                lesson 9: backtrack and add an ID to the tx created in lesson 8. For lesson 9, broadcast with bitcoin-cli. Briefly explain the mempool, and miners, as well as confirmed/unconfirmed
 
                 lesson 10 tx has confirmed, look at tx history? or balance?
 
