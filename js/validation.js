@@ -1,6 +1,6 @@
 // The lessons that expect the user to input JavaScript
 const javaScriptLessons = [2, 3, 4, 5, 6, 8];
-const bitcoinRpcLessons = [7];
+const bitcoinRpcLessons = [7, 9, 10];
 
 function checkResult(lessonNumber, resultToCheck) {
     let checkedResult = resultToCheck;
@@ -30,7 +30,9 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
         lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
         lesson6: 'Please type \'createAddress()\'',
         lesson7: 'Please type \'bitcoin-cli getbalance\'',
-        lesson8: 'Please type \'signTransaction(privateKey, transaction)\''
+        lesson8: 'Please type \'signTransaction(privateKey, transaction)\'',
+        lesson9: 'Please copy and paste all of the \'bitcoin-cli sendrawtransaction\' command, including the giant string of letters and numbers. That is the transaction in hex format, and it is required.',
+        lesson10: 'Please type \'bitcoin-cli getbalance\'',
     };
 
     // lowercase because the input is normalized before it gets to this method
@@ -42,7 +44,9 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
         lesson5: 'hash(',
         lesson6: 'createaddress(',
         lesson7: 'bitcoin-cli getbalance',
-        lesson8: 'signtransaction('
+        lesson8: 'signtransaction(',
+        lesson9: 'bitcoin-cli sendrawtransaction',
+        lesson10: 'bitcoin-cli getbalance'
     }
 
     // It's ok if the user wants to put a semicolon at the end, but remove it to

@@ -87,7 +87,7 @@
             </div>
 
             <div class="lesson lesson7">
-                <h2>Transactions and coins</h2>
+                <h2>Transactions and Coins</h2>
                 <p>The movement of bitcoin is tracked by <strong>transactions</strong>. If Alice has one bitcoin and wants to send it to you, the transaction would look something like this:</p>
                 <p><img class="lesson-image" src='assets/transactionExample1.png'></p>
                 <p>Transactions are divided into two parts, the <strong>input</strong> and <strong>output</strong>.</p>
@@ -116,19 +116,37 @@
                 <p>If we tried to broadcast this transaction out to the Bitcoin network as-is, it would be rejected. So, we must sign the transaction. We'll call the <code>signTransaction()</code> function for this. It's similar to the <code>signMessage()</code> method we called earlier, but instead of using anything we want for the message, it accepts a transaction and creates the appropriate number of signatures. It generates one signature one for each input. The raw transaction we looked at has been saved to the <code>transaction</code> variable. Type <code>signTransaction(privateKey, transaction)</code> into the console to sign the transaction.</p>
             </div>
 
+            <div class="lesson lesson9">
+                <h2>Broadcasting a Transaction</h2>
+                <p>Great! The transaction has been signed. Now we can go ahead and <strong>broadcast</strong> it. This means giving the transaction to a Bitcoin node which will propogate it to the rest of the nodes in the network. Each Bitcoin node has a set of peers they reguarly "talk" to. When a node hears about a new transaction, it goes ahead and tells its peers.</p>
+                <p>It only takes <a href="https://bitcoin.stackexchange.com/questions/76789/is-bitcoins-gossip-protocol-perfect" target="_blank">a few minutes</a> for a transaction to make it to the rest of the network!</p>
+                <p>We'll be using that same Bitcoin Core client we used earlier to do the broadcast. The command name is <code><a href="https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html" target="_blank">sendrawtransaction</a></code> and it accepts the transaction in hexadecimal format.</p>
+                <p>The conversion to hex has already been done, but you will notice that it comes out to be quite a long string of letters and numbers! Copy the following command and run it in the console:</p>
+                <p><textarea id='lesson9BroadcastTx' style="width:100%; height:200px; word-wrap:break-word;"></textarea></p>
+            </div>
 
-            <!-- TODO: 
+            <div class="lesson lesson10">
+                <h2>Waiting for Confirmations</h2>
+                <p>After successfully broadcasting, the Bitcoin Core client returned the transaction ID. Since this is just an educational exercise, we can't do much with the transaction ID, but if it were real we'd be able to look up the transaction in a <a href="https://blockstream.info/" target="_blank">block explorer</a> and see all kinds of detail about it.</p>
+                <p>Now that the rest of the network knows about your transaction, it's almost finalized, but there's one more step: mining!</p>
+                <p>This is where the "block" part of the Bitcoin blockchain comes in. After you broadcast a transaction, it goes to a special holding area called the <strong>mempool</strong>. Unconfirmed transactions hang out here, waiting to be picked up by a miner and put into a block.</p>
+                <p>The mempool is not one centralized place. Every node has its own copy of the mempool.</p>
+                <p>Roughly every ten minutes, a miner will take a bunch of unconfirmed transactions from the mempool and "mine" (aka put) them into a block. The likelihood of your transaction making it into the next block depends on the other transactions in the mempool and the fees you choose to pay.</p>
+                <p>We didn't explicitly cover fees in this tutorial, but learned a little bit about them when going over change outputs. Remember the example where Alice had 10 bitcoin and wanted to send you one? She had to specify the remaining 9 will be returned back to her, otherwise they would be considered fees! Fees go to the miner that creates the block.</p>
+                <p>Any amount of bitcoin that is "left over" in a transaction is considered to be the fee. In the previous example if Alice decides to only return 8.5 bitcoin to herself, then 0.5 bitcoin would be the transaction fee. The math checks out: the total transaction input is 10 (Alice's 10 bitcoin), and the total output is 9.5 (1 to you, and 8.5 back to Alice as change).</p>
+                <p>In the early days of Bitcoin, transactions didn't need to pay fees, but as Bitcoin matures, we see that fees are becoming increasingly important.</p>
+                <p>For our exercise we'll pretend some time has passed and the transaction has been mined into a block. How do we know this? we can use one of the block explorers mentioned earlier to monitor the blockchain and see when our transaction is mined.</p>
+                <p>The last thing to to is check our balance one more time to make sure that it's accurate. You can do that with the samme <code>bitcoin-cli getbalance</code> command from an earlier lesson.</p>
+            </div>
 
-                lesson 9: backtrack and add an ID to the tx created in lesson 8. For lesson 9, broadcast with bitcoin-cli. Briefly explain the mempool, and miners, as well as confirmed/unconfirmed
-
-                lesson 10 tx has confirmed, look at tx history? or balance?
-
+            <!--
                 Potential future routes: the mempool, mining. "a bitcoin journey" from a wallet to a block
             -->
             <div class="lesson final">
                 <h2>That's all for now!</h2>
-                <p>Thank you for checking out this proof-of-concept. If you wish to do it again, you can use the <code>reset</code> command.</p>
-                <p>The fun doesn't have to stop here though! Check out these resources to continue learning about Bitcoin:</p>
+                <p>The balance is correct! We started with 2 bitcoin (one from Alice, and one from Bob), sent 1.5 to our friend Hal, and had 0.5 returned.</p>
+                <p>Thank you for checking out this little proof-of-concept. If you wish to do it again, you can use the <code>reset</code> command.</p>
+                <p>The fun doesn't have to stop here though! You're now ready to venture futher down the Bitcoin rabbit hole. Here are some of my favorite resources to continue learning about Bitcoin:</p>
                 <p>&nbsp;</p>
                 <p><strong>General resources:</strong></p>
                 <p>- <a href="https://learning.chaincode.com/" target="_blank">6 week virtual seminars</a> with Chaincode Labs</p></p>

@@ -15,11 +15,12 @@ const stringUtils = require('./stringUtils');
 
 const schnorr = require('bip-schnorr');
 
-const forge = require('node-forge'); // "asm": "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef",
-// "asm": "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3",
-// This is an extremely simplified example of what a transaction looks like.
+const forge = require('node-forge'); // This is an extremely simplified example of what a transaction looks like.
 // so many fields have been removed, and some have even been changed to accomodate
 // a beginner audience (i.e. vin => inputs). This is NOT canonical!!!!
+// Script sigs (should have saved the hex values but it doesn't matter):
+// "asm": "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef",
+// "asm": "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3",
 
 
 let mockTxToSign = {
@@ -37,7 +38,10 @@ let mockTxToSign = {
     "value": 0.50000000,
     "address": "14wiw5uGiZtFNqmwEfDZJM8k2qzxxd9fS5"
   }]
-};
+}; // More mock data. This is not the actual transaction hashe or the hex data
+
+let mockTxId = '7a37db6dae291ce730ab8de40650844d627a20a096f323836636236e200a55b5';
+let rawSignedTx = '0200000001797a827a25bdf354b9f9440d7de2ded6596cc2c8b8dc2eaf936a476049f898c4000000006a473044022034c2cde7e751cb6d72bceb73cbad5614f43d60a59142f6eef20a40786f683772022070b9a8c6d71d9ea628fa943e51ccf5d35bafd71e364f00e1dfbacb5b8b873c5901210227d85ba011276cf25b51df6a188b75e604b38770a462b2d0e9fb2fc839ef5d3ffdffffff03c41b1a1e010000001976a914a96c7dbd1264f69bb52549618f3c59c9440f3c6f88ac80d1f008000000001976a91460baa0f494b38ce3c940dea67f3804dc52d1fb9488ac80f0fa02000000001976a914ba27f99e007c7f605a8305e318c1abde3cd220ac88ac00000000';
 
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
   const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
@@ -67,7 +71,9 @@ function hash(inputString) {
 module.exports = {
   verifySignature,
   hash,
-  mockTxToSign
+  mockTxId,
+  mockTxToSign,
+  rawSignedTx
 };
 
 }).call(this)}).call(this,require("buffer").Buffer)
@@ -268,13 +274,18 @@ async function evaluateCode(userInput, lessonNumber) {
 
 function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
   const expectedInput = {
-    7: 'bitcoin-cli getbalance'
+    7: 'bitcoin-cli getbalance',
+    9: `bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`,
+    10: 'bitcoin-cli getbalance'
   };
   const lessonAnswers = {
-    7: "1.00000000"
+    7: "1.00000000",
+    9: helperMethods.mockTxId,
+    10: "0.50000000"
   };
 
   if (expectedInput[lessonNumber] === userInputCommand) {
+    console.log('you did it! returning happy face');
     return {
       success: true,
       result: lessonAnswers[lessonNumber]
@@ -312,6 +323,8 @@ $(function () {
   //  .js:                $("#demo").html("Hello, World!");
   // Fill in the JSON for lesson 8
   $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
+  console.log(helperMethods.rawSignedTx);
+  $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`);
   const $console = $('.console');
   const $consolePrompt = $('.console-prompt');
   const $userInput = $('.console-input'); // Focus on the user input box
@@ -444,7 +457,7 @@ module.exports = {
 },{"buffer":83}],5:[function(require,module,exports){
 // The lessons that expect the user to input JavaScript
 const javaScriptLessons = [2, 3, 4, 5, 6, 8];
-const bitcoinRpcLessons = [7];
+const bitcoinRpcLessons = [7, 9, 10];
 
 function checkResult(lessonNumber, resultToCheck) {
   let checkedResult = resultToCheck;
@@ -475,7 +488,9 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
     lesson6: 'Please type \'createAddress()\'',
     lesson7: 'Please type \'bitcoin-cli getbalance\'',
-    lesson8: 'Please type \'signTransaction(privateKey, transaction)\''
+    lesson8: 'Please type \'signTransaction(privateKey, transaction)\'',
+    lesson9: 'Please copy and paste all of the \'bitcoin-cli sendrawtransaction\' command, including the giant string of letters and numbers. That is the transaction in hex format, and it is required.',
+    lesson10: 'Please type \'bitcoin-cli getbalance\''
   }; // lowercase because the input is normalized before it gets to this method
 
   const expectedCommandBeginning = {
@@ -486,7 +501,9 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson5: 'hash(',
     lesson6: 'createaddress(',
     lesson7: 'bitcoin-cli getbalance',
-    lesson8: 'signtransaction('
+    lesson8: 'signtransaction(',
+    lesson9: 'bitcoin-cli sendrawtransaction',
+    lesson10: 'bitcoin-cli getbalance'
   }; // It's ok if the user wants to put a semicolon at the end, but remove it to
   // make validation a little simpler
 

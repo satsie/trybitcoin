@@ -186,14 +186,19 @@ async function evaluateCode(userInput, lessonNumber) {
 // than this (like running a regtest Docker container)
 function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
     const expectedInput = {
-        7: 'bitcoin-cli getbalance'
+        7: 'bitcoin-cli getbalance',
+        9: `bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`,
+        10: 'bitcoin-cli getbalance'
     };
 
     const lessonAnswers = {
-        7: "1.00000000"
+        7: "1.00000000",
+        9: helperMethods.mockTxId,
+        10: "0.50000000"
     }
 
     if (expectedInput[lessonNumber] === userInputCommand) {
+        console.log('you did it! returning happy face');
         return {
             success: true,
             result: lessonAnswers[lessonNumber]
@@ -244,6 +249,8 @@ $(function() {
 
     // Fill in the JSON for lesson 8
     $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
+    console.log(helperMethods.rawSignedTx);
+    $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`);
 
     const $console = $('.console');
     const $consolePrompt = $('.console-prompt');
