@@ -11,6 +11,8 @@
  @errorColor: #d14;
  @codeColor: #222;
  @orangeColor: #ed602b;
+ @lightorangeColor: #f3baa6;
+
  
  // http://www.paulirish.com/2012/box-sizing-border-box-ftw/
  html {
@@ -71,9 +73,37 @@
          flex: 1;
      }
  
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: @bgAccent;
+    }
+  
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: @lightorangeColor;
+    }
+  
+    /* Handle on hover */
+     ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
      pre {
         font-size: 13px;
         font-family: monospace;
+     }
+
+     textarea {
+        border-style: dashed;
+        border-color: @orangeColor;
+        outline: none;
+        padding: 10px;
+        width: 100%;
+        word-wrap: break-word;
      }
 
      @media all and (max-width: 640px) {
@@ -89,7 +119,7 @@
              order: -1;
          }
      }
- 
+
      .console {
          padding-right: 20px;
          font-family: monospace;
@@ -157,60 +187,73 @@
      }
  
      .instructions {
-         padding: 0 50px 0 50px;
-         overflow: auto;
- 
-         h2 {
-             font-size: 18pt;
-             font-weight: 600;
-             margin-bottom: 20px;
-         }
- 
-         p, pre {
-             line-height: 1.4;
-             margin-bottom: 10px;
-         }
- 
-         li {
-             line-height: 1.4;
-             margin-bottom: 5px;
-         }
- 
-         code {
-             font-family: monospace;
-             white-space: pre;
-             border-radius: 3px;
-             background: #eee;
-             padding: 3px;
-             color: @codeColor;
-         }
- 
-         em {
-             font-style: italic;
-         }
- 
-         strong {
-             font-weight: bold;
-         }
- 
-         .lesson {
-            background-color: white;
-         }
+        display: flex;
+        flex-direction: column;
 
-         .lesson-image {
-            max-width: 100%;
-            height: auto;
-         }
+        strong {
+            font-weight: bold;
+        }
 
-         .lesson:not(.lesson1) {
-             display: none;
+        .lessons {
+            padding: 0 50px 0 50px;
+            overflow: auto;
+
+            h2 {
+                font-size: 18pt;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+    
+            p, pre {
+                line-height: 1.4;
+                margin-bottom: 10px;
+            }
+    
+            li {
+                line-height: 1.4;
+                margin-bottom: 5px;
+            }
+    
+            code {
+                font-family: monospace;
+                white-space: pre;
+                border-radius: 3px;
+                background: #eee;
+                padding: 3px;
+                color: @codeColor;
+            }
+    
+            em {
+                font-style: italic;
+            }
+
+            .lesson {
+                background-color: white;
+            }
+
+            .lesson-image {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .lesson:not(.lesson1) {
+                display: none;
+            }
+        }
+
+        .progressIndicator {
+            padding: 20px 0 0 50px;
+            color: @orangeColor;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
          }
-     }
+    }
+
  }
  
  footer {
-     margin-top: 30px;
-     height: 90px;
+    margin-top: 30px;
+    height: 90px;
  
      display: flex;
      flex-direction: column;
@@ -218,12 +261,6 @@
  
      background-color: @bgAccent;
      text-align: center;
- 
-     @media all and (max-width: 500px) {
-         small {
-          display: none;
-         }
-     }
  }
  
  @media all and (max-width: 500px) {

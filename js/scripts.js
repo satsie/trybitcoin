@@ -63,7 +63,13 @@ function startLesson(newLessonNumber) {
     // If there is no lesson to show, display the final page
     if (!$('.lesson' + currentLesson).length) {
         $('.final').show();
+        $("#lessonNumber").html('');
+    } else {
+        // Only display lesson progress if this isn't the final page
+        $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}`);
     }
+
+
 }
 
 // Increment the current lesson counter, save to local storage, and call
@@ -249,7 +255,6 @@ $(function() {
 
     // Fill in the JSON for lesson 8
     $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
-    console.log(helperMethods.rawSignedTx);
     $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`);
 
     const $console = $('.console');

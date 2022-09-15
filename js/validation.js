@@ -1,6 +1,7 @@
 // The lessons that expect the user to input JavaScript
 const javaScriptLessons = [2, 3, 4, 5, 6, 8];
 const bitcoinRpcLessons = [7, 9, 10];
+const totalNumberLessons = 10;
 
 function checkResult(lessonNumber, resultToCheck) {
     let checkedResult = resultToCheck;
@@ -79,5 +80,6 @@ module.exports = {
     bitcoinRpcLessons,
     checkResult,
     javaScriptLessons,
+    totalNumberLessons,
     userInputSanityCheck
 }

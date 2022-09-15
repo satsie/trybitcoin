@@ -31,144 +31,148 @@
         </div>
 
         <div class="instructions">
-            <div class="lesson lesson1">
-                <h2>Getting started with Bitcoin</h2>
-                <p>This is an interactive Bitcoin tutorial that uses JavaScript and popular open source Bitcoin libraries like <a href='https://github.com/guggero/bip-schnorr' target="_blank">bip-schnorr</a> to explain different parts of the Bitcoin network.</p>
-                <p>If you get stuck at any point in the tutorial, run the <code>help</code> command.</p>
-                <p>To begin, type <code>start</code> into the console on the left.</p>
-            </div>
+            <div class="lessons">
+                <div class="lesson lesson1">
+                    <h2>Getting started with Bitcoin</h2>
+                    <p>This is an interactive Bitcoin tutorial that uses JavaScript and popular open source Bitcoin libraries like <a href='https://github.com/guggero/bip-schnorr' target="_blank">bip-schnorr</a> to explain different parts of the Bitcoin network.</p>
+                    <p>If you get stuck at any point in the tutorial, run the <code>help</code> command.</p>
+                    <p>To begin, type <code>start</code> into the console on the left.</p>
+                </div>
 
-            <div class="lesson lesson2">
-                <h2>Most people are familiar with bitcoin as a type of money, but what does it mean to own some?</h2>
-                <p>Units of bitcoin are assigned to things called <strong>public keys</strong>.</p>
-                <p>For more advanced scenarios, bitcoin can belong to scripts that involve multiple public keys.</p>
-                <p>Every public key has a corresponding <strong>private key</strong>.</p>
-                <p>The public key is meant to be shared. The private key should never be revealed to anyone else. </p>
-                <p>Let's start by generating a pair of public and private keys to see what they look like.</p>
-                <p>Type <code>generateKeys()</code> into the console to create a keypair.</p>
-            </div>
+                <div class="lesson lesson2">
+                    <h2>Most people are familiar with bitcoin as a type of money, but what does it mean to own some?</h2>
+                    <p>Units of bitcoin are assigned to things called <strong>public keys</strong>.</p>
+                    <p>For more advanced scenarios, bitcoin can belong to scripts that involve multiple public keys.</p>
+                    <p>Every public key has a corresponding <strong>private key</strong>.</p>
+                    <p>The public key is meant to be shared. The private key should never be revealed to anyone else. </p>
+                    <p>Let's start by generating a pair of public and private keys to see what they look like.</p>
+                    <p>Type <code>generateKeys()</code> into the console to create a keypair.</p>
+                </div>
 
-            <div class="lesson lesson3">
-                <p>As you can see, public and private keys can be represented by strings of letters and numbers. These ones are encoded in hex.</p>
-                <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information. The public key is then used to verify the signature's authenticity.</p>
-                <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify the signature came from you.</p>
-                <p>The private key that was generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>signMessage(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
-            </div>
+                <div class="lesson lesson3">
+                    <p>As you can see, public and private keys can be represented by strings of letters and numbers. These ones are encoded in hex.</p>
+                    <p>You can do some pretty cool stuff with public and private keys. A private key can be used to create a <strong>digital signature</strong> for some piece of information. The public key is then used to verify the signature's authenticity.</p>
+                    <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify the signature came from you.</p>
+                    <p>The private key that was generated in the previous lesson has been saved to the <code>privateKey</code> variable. Type <code>signMessage(privateKey, 'any message')</code> to sign a message. Feel free to change the message to something more exciting. The digital signature will be returned.</p>
+                </div>
 
-            <div class="lesson lesson4">
-                <p>Nice work! We've signed a message with a private key. Now we can use the corresponding public key to verify the signature's authenticity.</p>
-                <p>Type <code>verifySignature(publicKey, message, signature)</code> to verify that the signature came from the private key we think it did.</p>
-            </div>
+                <div class="lesson lesson4">
+                    <p>Nice work! We've signed a message with a private key. Now we can use the corresponding public key to verify the signature's authenticity.</p>
+                    <p>Type <code>verifySignature(publicKey, message, signature)</code> to verify that the signature came from the private key we think it did.</p>
+                </div>
 
-            <div class="lesson lesson5">
-                <h2>Hashing</h2>
-                <p>These digital signatures are one of the most important technical concepts in Bitcoin. Spending is actually the act of signing a message to transfer ownership of the bitcoin.</p>
-                <p>You may have heard about the importance of protecting your private keys. This is why! Anyone that has access to them can sign messages on your behalf, messages that transfer ownership (aka spend) your bitcoin.</p>
-                <p>Speaking of message signing, another essential part of Bitcoin is <strong>hashing</strong>. Hashing is kind of like creating a digital fingerprint for a piece of data. You have a one way function that returns an output of a fixed size. Just like fingerprints, hashes are unique*. You also can't reverse engineer a hash and figure out the data that was used to generate it.</p>
-                <p>Hashes are reliable in the sense that they are deterministic. You can hash the same piece of data over and over again and you'll always get the same result.</p>
-                <p>Here's an example. I've taken the phrase "Cypherpunks write code" and sent it through a hash function, that sparkly black box. Out pops a string of letters and numbers.</p>
-                <p><img class="lesson-image" src='assets/hashExample1.png'></p>
-                <p>This probably doesn't look that exciting. The resulting hash is actually longer than the phrase that was input, and it's now completely indecipherable. But what if we tried hashing something longer? What about hashing the first paragraph of the Bitcoin whitepaper?</p>
-                <p><img class="lesson-image" src='assets/hashExample2.png'></p>
-                <p>Look at that! That long paragrah has been reduced to a unique string of letters and numbers. As expected, it's totally different than the hash for "Cypherpunks write code", yet the two hashes are the same length.</p>
-                <p>You see hashes all over Bitcoin, from transaction IDs, to address creation, to scripts that define particular spending conditions. Oftentimes, a piece of information will be reduced to its hash to save space.</p>
-                <p>Let's test the deterministic property of hash functions. Type <code>hash('Cypherpunks write code')</code> to test that the hash is the same as the example above.</p>
-                <p><i>* when a hash is not unique, this is called a "hash collision"</i></p>
-            </div>
+                <div class="lesson lesson5">
+                    <h2>Hashing</h2>
+                    <p>These digital signatures are one of the most important technical concepts in Bitcoin. Spending is actually the act of signing a message to transfer ownership of the bitcoin.</p>
+                    <p>You may have heard about the importance of protecting your private keys. This is why! Anyone that has access to them can sign messages on your behalf, messages that transfer ownership (aka spend) your bitcoin.</p>
+                    <p>Speaking of message signing, another essential part of Bitcoin is <strong>hashing</strong>. Hashing is kind of like creating a digital fingerprint for a piece of data. You have a one way function that returns an output of a fixed size. Just like fingerprints, hashes are unique*. You also can't reverse engineer a hash and figure out the data that was used to generate it.</p>
+                    <p>Hashes are reliable in the sense that they are deterministic. You can hash the same piece of data over and over again and you'll always get the same result.</p>
+                    <p>Here's an example. I've taken the phrase "Cypherpunks write code" and sent it through a hash function, that sparkly black box. Out pops a string of letters and numbers.</p>
+                    <p><img class="lesson-image" src='assets/hashExample1.png'></p>
+                    <p>This probably doesn't look that exciting. The resulting hash is actually longer than the phrase that was input, and it's now completely indecipherable. But what if we tried hashing something longer? What about hashing the first paragraph of the Bitcoin whitepaper?</p>
+                    <p><img class="lesson-image" src='assets/hashExample2.png'></p>
+                    <p>Look at that! That long paragrah has been reduced to a unique string of letters and numbers. As expected, it's totally different than the hash for "Cypherpunks write code", yet the two hashes are the same length.</p>
+                    <p>You see hashes all over Bitcoin, from transaction IDs, to address creation, to scripts that define particular spending conditions. Oftentimes, a piece of information will be reduced to its hash to save space.</p>
+                    <p>Let's test the deterministic property of hash functions. Type <code>hash('Cypherpunks write code')</code> to test that the hash is the same as the example above.</p>
+                    <p><i>* when a hash is not unique, this is called a "hash collision"</i></p>
+                </div>
 
-            <div class="lesson lesson6">
-                <h2>Addresses</h2>
-                <p>Now that we know about public/private keypairs and hashing, we can learn what it means to receive bitcoin. When you want someone to send you bitcoin, you provide a receiving <strong>address</strong>.</p>
-                <p>Here's what one looks like: <code>2NEwkTybLpYyaRooBFMXAJDtchRdA8FMM4G</code></p>
-                <p>Yes, another random looking string of letters and numbers... but this time it's actually a hash!</p>
-                <p>Addresses come from from public keys. For advanced applications, you can create an address from a script that contains one or more public keys.</p>
-                <p>We know from the previous lesson that you cannot go backwards with hashes. So if someone gives you an address, you cannot reverse engineer the public key, or keys that were used to create it.</p>
-                <p>Try generating an address for yourself! Type <code>createAddress(publicKey)</code> to invoke the <code>createAddress()</code> function with your public key.</p>
-            </div>
+                <div class="lesson lesson6">
+                    <h2>Addresses</h2>
+                    <p>Now that we know about public/private keypairs and hashing, we can learn what it means to receive bitcoin. When you want someone to send you bitcoin, you provide a receiving <strong>address</strong>.</p>
+                    <p>Here's what one looks like: <code>2NEwkTybLpYyaRooBFMXAJDtchRdA8FMM4G</code></p>
+                    <p>Yes, another random looking string of letters and numbers... but this time it's actually a hash!</p>
+                    <p>Addresses come from from public keys. For advanced applications, you can create an address from a script that contains one or more public keys.</p>
+                    <p>We know from the previous lesson that you cannot go backwards with hashes. So if someone gives you an address, you cannot reverse engineer the public key, or keys that were used to create it.</p>
+                    <p>Try generating an address for yourself! Type <code>createAddress(publicKey)</code> to invoke the <code>createAddress()</code> function with your public key.</p>
+                </div>
 
-            <div class="lesson lesson7">
-                <h2>Transactions and Coins</h2>
-                <p>The movement of bitcoin is tracked by <strong>transactions</strong>. If Alice has one bitcoin and wants to send it to you, the transaction would look something like this:</p>
-                <p><img class="lesson-image" src='assets/transactionExample1.png'></p>
-                <p>Transactions are divided into two parts, the <strong>input</strong> and <strong>output</strong>.</p>
-                <p>This is similar to double entry bookkeeping, a practice popular with Italian merchants in the 14th century. These ledgers had two columns, one for debits and one for credits. The input part of the transaction is like the "debit" column and the output part is like the "credit" column.</p>
-                <p><img class="lesson-image" src='assets/doubleEntryBookkeeping.jpg'></p>
-                <p><center><em>Source: Christopher Watrous' account book, Debits and Credits for Vincent Stillwill accounts, Durham, Connecticut, 1817</em></center></p>
-                <p>In our example there is only one input (Alice's one bitcoin) and one output (now your bitcoin). What if Alice had 10 bitcoin? If she only wants to give you one, she must specify the remaining 9 will be returned as change. Here's what that transaction looks like:</p>
-                <p><img class="lesson-image" src='assets/transactionExample2.png'></p>
-                <p>If Alice didn't specify that she wanted change back, the remaining 9 bitcoin would go to people we call miners (more on that later)! </p>
-                <p>As you see, this transaction has one input and two outputs. Inputs and outputs are very much like dollar bills. They can't be broken up without a transaction. If Alice only has a $10 bill and wants to give you $1, she can't make change on her own. She can't rip off 1/10th of the bill and give it to you. She needs to create a transaction and provide the $10 bill as the input.</p>
-                <p>Things start to differ from traditional (fiat) money when we look at denominations. In Bitcoin, you can have a "bill" in any denomination. So Alice would actually recieve a $9 bill back as change.</p>
-                <p>Inputs and outputs (aka Alice's 10 bitcoin input, her 9 bitcoin change, and your 1 bitcoin) are often referred to as <strong>coins</strong>. It seems like a simple, straightforward term, but remember that a "coin" is any denomination of bitcoin. It doesn't have to be 1 bitcoin. It can be 21 bitcoin, or fractions of a bitcoin like 0.1. You'll hear "coin" used a lot in the context of privacy.</p>
-                <p>The reference implementation of Bitcoin is a client called <a href="https://bitcoincore.org/" target="_blank">Bitcoin Core</a>. Bitcoin Core has a bunch of <a href="https://en.wikipedia.org/wiki/Remote_procedure_call" target="_blank">RPC</a> commands you can use to manage your bitcoin. Let's try the <code>getbalance</code> command to see the 1 bitcoin that Alice sent you. Type <code>bitcoin-cli getbalance</code> into the console.</p>
-            </div>
+                <div class="lesson lesson7">
+                    <h2>Transactions and Coins</h2>
+                    <p>The movement of bitcoin is tracked by <strong>transactions</strong>. If Alice has one bitcoin and wants to send it to you, the transaction would look something like this:</p>
+                    <p><img class="lesson-image" src='assets/transactionExample1.png'></p>
+                    <p>Transactions are divided into two parts, the <strong>input</strong> and <strong>output</strong>.</p>
+                    <p>This is similar to double entry bookkeeping, a practice popular with Italian merchants in the 14th century. These ledgers had two columns, one for debits and one for credits. The input part of the transaction is like the "debit" column and the output part is like the "credit" column.</p>
+                    <p><img class="lesson-image" src='assets/doubleEntryBookkeeping.jpg'></p>
+                    <p><center><em>Source: Christopher Watrous' account book, Debits and Credits for Vincent Stillwill accounts, Durham, Connecticut, 1817</em></center></p>
+                    <p>In our example there is only one input (Alice's one bitcoin) and one output (now your bitcoin). What if Alice had 10 bitcoin? If she only wants to give you one, she must specify the remaining 9 will be returned as change. Here's what that transaction looks like:</p>
+                    <p><img class="lesson-image" src='assets/transactionExample2.png'></p>
+                    <p>If Alice didn't specify that she wanted change back, the remaining 9 bitcoin would go to people we call miners (more on that later)! </p>
+                    <p>As you see, this transaction has one input and two outputs. Inputs and outputs are very much like dollar bills. They can't be broken up without a transaction. If Alice only has a $10 bill and wants to give you $1, she can't make change on her own. She can't rip off 1/10th of the bill and give it to you. She needs to create a transaction and provide the $10 bill as the input.</p>
+                    <p>Things start to differ from traditional (fiat) money when we look at denominations. In Bitcoin, you can have a "bill" in any denomination. So Alice would actually recieve a $9 bill back as change.</p>
+                    <p>Inputs and outputs (aka Alice's 10 bitcoin input, her 9 bitcoin change, and your 1 bitcoin) are often referred to as <strong>coins</strong>. It seems like a simple, straightforward term, but remember that a "coin" is any denomination of bitcoin. It doesn't have to be 1 bitcoin. It can be 21 bitcoin, or fractions of a bitcoin like 0.1. You'll hear "coin" used a lot in the context of privacy.</p>
+                    <p>The reference implementation of Bitcoin is a client called <a href="https://bitcoincore.org/" target="_blank">Bitcoin Core</a>. Bitcoin Core has a bunch of <a href="https://en.wikipedia.org/wiki/Remote_procedure_call" target="_blank">RPC</a> commands you can use to manage your bitcoin. Let's try the <code>getbalance</code> command to see the 1 bitcoin that Alice sent you. Type <code>bitcoin-cli getbalance</code> into the console.</p>
+                </div>
 
-            <div class="lesson lesson8">
-                <h2>Transaction Signing</h2>
-                <p>Let's pretend Bob also sends you 1 bitcoin. For privacy reasons, address reuse is not advised. Since Alice sent bitcoin to the address you generated earlier, you create a new one to give to Bob. <em>The details on how you can generate a range of addreses is outside the scope of this tutorial. You can learn more by checking out <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki" target="_blank">BIP 32</a></em>.</p>
-                <p>Now you have 2 bitcoin and you'd like to purchase something from your friend Hal for 1.5 bitcoin. You do this by creating a transaction like this:</p>
-                <p><img class="lesson-image" src='assets/transactionExample3.png'></p>
-                <p>The two inputs are the bitcoin you received from Alice and Bob. The first output sends 1.5 bitcoin to Hal, and the second returns the 0.5 bitcoin change back to you, to a new address that you generate.</p>
-                <p>This transaction is almost good to go, except for one very important step! Earlier we learned that in order to spend bitcoin, you must sign a message that authorizes the transfer of funds. This is how you prevent others from spending your bitcoin. The message that you sign is actually the transaction! In previous examples both Alice and Bob had to sign their transactions when they sent you bitcoin.</p>
-                <p>Transactions have a special area where the spender adds their digital signature. This field is named <strong><code>scriptSig</code></strong>, though there are lots of special cases and rules for it that we won't cover in this lesson. For now, all we need to remember is that signatures go in the scriptSig field, and transactions aren't complete until they are signed.</p>
-                <p>Below, we have the raw data for our transaction. We can see the two scriptSig fields (one for each input) are empty:</p>
-                <pre><p id="lesson8UnsignedTx"></p></pre>
-                <p>If we tried to broadcast this transaction out to the Bitcoin network as-is, it would be rejected. So, we must sign the transaction. We'll call the <code>signTransaction()</code> function for this. It's similar to the <code>signMessage()</code> method we called earlier, but instead of using anything we want for the message, it accepts a transaction and creates the appropriate number of signatures. It generates one signature one for each input. The raw transaction we looked at has been saved to the <code>transaction</code> variable. Type <code>signTransaction(privateKey, transaction)</code> into the console to sign the transaction.</p>
-            </div>
+                <div class="lesson lesson8">
+                    <h2>Transaction Signing</h2>
+                    <p>Let's pretend Bob also sends you 1 bitcoin. For privacy reasons, address reuse is not advised. Since Alice sent bitcoin to the address you generated earlier, you create a new one to give to Bob. <em>The details on how you can generate a range of addreses is outside the scope of this tutorial. You can learn more by checking out <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki" target="_blank">BIP 32</a></em>.</p>
+                    <p>Now you have 2 bitcoin and you'd like to purchase something from your friend Hal for 1.5 bitcoin. You do this by creating a transaction like this:</p>
+                    <p><img class="lesson-image" src='assets/transactionExample3.png'></p>
+                    <p>The two inputs are the bitcoin you received from Alice and Bob. The first output sends 1.5 bitcoin to Hal, and the second returns the 0.5 bitcoin change back to you, to a new address that you generate.</p>
+                    <p>This transaction is almost good to go, except for one very important step! Earlier we learned that in order to spend bitcoin, you must sign a message that authorizes the transfer of funds. This is how you prevent others from spending your bitcoin. The message that you sign is actually the transaction! In previous examples both Alice and Bob had to sign their transactions when they sent you bitcoin.</p>
+                    <p>Transactions have a special area where the spender adds their digital signature. This field is named <strong><code>scriptSig</code></strong>, though there are lots of special cases and rules for it that we won't cover in this lesson. For now, all we need to remember is that signatures go in the scriptSig field, and transactions aren't complete until they are signed.</p>
+                    <p>Below, we have the raw data for our transaction. We can see the two scriptSig fields (one for each input) are empty:</p>
+                    <pre><p id="lesson8UnsignedTx"></p></pre>
+                    <p>If we tried to broadcast this transaction out to the Bitcoin network as-is, it would be rejected. So, we must sign the transaction. We'll call the <code>signTransaction()</code> function for this. It's similar to the <code>signMessage()</code> method we called earlier, but instead of using anything we want for the message, it accepts a transaction and creates the appropriate number of signatures. It generates one signature one for each input. The raw transaction we looked at has been saved to the <code>transaction</code> variable. Type <code>signTransaction(privateKey, transaction)</code> into the console to sign the transaction.</p>
+                </div>
 
-            <div class="lesson lesson9">
-                <h2>Broadcasting a Transaction</h2>
-                <p>Great! The transaction has been signed. Now we can go ahead and <strong>broadcast</strong> it. This means giving the transaction to a Bitcoin node which will propogate it to the rest of the nodes in the network. Each Bitcoin node has a set of peers they reguarly "talk" to. When a node hears about a new transaction, it goes ahead and tells its peers.</p>
-                <p>It only takes <a href="https://bitcoin.stackexchange.com/questions/76789/is-bitcoins-gossip-protocol-perfect" target="_blank">a few minutes</a> for a transaction to make it to the rest of the network!</p>
-                <p>We'll be using that same Bitcoin Core client we used earlier to do the broadcast. The command name is <code><a href="https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html" target="_blank">sendrawtransaction</a></code> and it accepts the transaction in hexadecimal format.</p>
-                <p>The conversion to hex has already been done, but you will notice that it comes out to be quite a long string of letters and numbers! Copy the following command and run it in the console:</p>
-                <p><textarea id='lesson9BroadcastTx' style="width:100%; height:200px; word-wrap:break-word;"></textarea></p>
-            </div>
+                <div class="lesson lesson9">
+                    <h2>Broadcasting a Transaction</h2>
+                    <p>Great! The transaction has been signed. Now we can go ahead and <strong>broadcast</strong> it. This means giving the transaction to a Bitcoin node which will propogate it to the rest of the nodes in the network. Each Bitcoin node has a set of peers they reguarly "talk" to. When a node hears about a new transaction, it goes ahead and tells its peers.</p>
+                    <p>It only takes <a href="https://bitcoin.stackexchange.com/questions/76789/is-bitcoins-gossip-protocol-perfect" target="_blank">a few minutes</a> for a transaction to make it to the rest of the network!</p>
+                    <p>We'll be using that same Bitcoin Core client we used earlier to do the broadcast. The command name is <code><a href="https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html" target="_blank">sendrawtransaction</a></code> and it accepts the transaction in hexadecimal format.</p>
+                    <p>The conversion to hex has already been done, but you will notice that it comes out to be quite a long string of letters and numbers! Copy the following command and run it in the console:</p>
+                    <p><textarea id='lesson9BroadcastTx' spellcheck="false" style="height:200px;"></textarea></p>
+                </div>
 
-            <div class="lesson lesson10">
-                <h2>Waiting for Confirmations</h2>
-                <p>After successfully broadcasting, the Bitcoin Core client returned the transaction ID. Since this is just an educational exercise, we can't do much with the transaction ID, but if it were real we'd be able to look up the transaction in a <a href="https://blockstream.info/" target="_blank">block explorer</a> and see all kinds of detail about it.</p>
-                <p>Now that the rest of the network knows about your transaction, it's almost finalized, but there's one more step: mining!</p>
-                <p>This is where the "block" part of the Bitcoin blockchain comes in. After you broadcast a transaction, it goes to a special holding area called the <strong>mempool</strong>. Unconfirmed transactions hang out here, waiting to be picked up by a miner and put into a block.</p>
-                <p>The mempool is not one centralized place. Every node has its own copy of the mempool.</p>
-                <p>Roughly every ten minutes, a miner will take a bunch of unconfirmed transactions from the mempool and "mine" (aka put) them into a block. The likelihood of your transaction making it into the next block depends on the other transactions in the mempool and the fees you choose to pay.</p>
-                <p>We didn't explicitly cover fees in this tutorial, but learned a little bit about them when going over change outputs. Remember the example where Alice had 10 bitcoin and wanted to send you one? She had to specify the remaining 9 will be returned back to her, otherwise they would be considered fees! Fees go to the miner that creates the block.</p>
-                <p>Any amount of bitcoin that is "left over" in a transaction is considered to be the fee. In the previous example if Alice decides to only return 8.5 bitcoin to herself, then 0.5 bitcoin would be the transaction fee. The math checks out: the total transaction input is 10 (Alice's 10 bitcoin), and the total output is 9.5 (1 to you, and 8.5 back to Alice as change).</p>
-                <p>In the early days of Bitcoin, transactions didn't need to pay fees, but as Bitcoin matures, we see that fees are becoming increasingly important.</p>
-                <p>For our exercise we'll pretend some time has passed and the transaction has been mined into a block. How do we know this? we can use one of the block explorers mentioned earlier to monitor the blockchain and see when our transaction is mined.</p>
-                <p>The last thing to to is check our balance one more time to make sure that it's accurate. You can do that with the samme <code>bitcoin-cli getbalance</code> command from an earlier lesson.</p>
-            </div>
+                <div class="lesson lesson10">
+                    <h2>Waiting for Confirmations</h2>
+                    <p>After successfully broadcasting, the Bitcoin Core client returned the transaction ID. Since this is just an educational exercise, we can't do much with the transaction ID, but if it were real we'd be able to look up the transaction in a <a href="https://blockstream.info/" target="_blank">block explorer</a> and see all kinds of detail about it.</p>
+                    <p>Now that the rest of the network knows about your transaction, it's almost finalized, but there's one more step: mining!</p>
+                    <p>This is where the "block" part of the Bitcoin blockchain comes in. After you broadcast a transaction, it goes to a special holding area called the <strong>mempool</strong>. Unconfirmed transactions hang out here, waiting to be picked up by a miner and put into a block.</p>
+                    <p>The mempool is not one centralized place. Every node has its own copy of the mempool.</p>
+                    <p>Roughly every ten minutes, a miner will take a bunch of unconfirmed transactions from the mempool and "mine" (aka put) them into a block. The likelihood of your transaction making it into the next block depends on the other transactions in the mempool and the fees you choose to pay.</p>
+                    <p>We didn't explicitly cover fees in this tutorial, but learned a little bit about them when going over change outputs. Remember the example where Alice had 10 bitcoin and wanted to send you one? She had to specify the remaining 9 will be returned back to her, otherwise they would be considered fees! Fees go to the miner that creates the block.</p>
+                    <p>Any amount of bitcoin that is "left over" in a transaction is considered to be the fee. In the previous example if Alice decides to only return 8.5 bitcoin to herself, then 0.5 bitcoin would be the transaction fee. The math checks out: the total transaction input is 10 (Alice's 10 bitcoin), and the total output is 9.5 (1 to you, and 8.5 back to Alice as change).</p>
+                    <p>In the early days of Bitcoin, transactions didn't need to pay fees, but as Bitcoin matures, we see that fees are becoming increasingly important.</p>
+                    <p>For our exercise we'll pretend some time has passed and the transaction has been mined into a block. How do we know this? we can use one of the block explorers mentioned earlier to monitor the blockchain and see when our transaction is mined.</p>
+                    <p>The last thing to to is check our balance one more time to make sure that it's accurate. You can do that with the samme <code>bitcoin-cli getbalance</code> command from an earlier lesson.</p>
+                </div>
 
-            <!--
-                Potential future routes: the mempool, mining. "a bitcoin journey" from a wallet to a block
-            -->
-            <div class="lesson final">
-                <h2>That's all for now!</h2>
-                <p>The balance is correct! We started with 2 bitcoin (one from Alice, and one from Bob), sent 1.5 to our friend Hal, and had 0.5 returned.</p>
-                <p>Thank you for checking out this little proof-of-concept. If you wish to do it again, you can use the <code>reset</code> command.</p>
-                <p>The fun doesn't have to stop here though! You're now ready to venture futher down the Bitcoin rabbit hole. Here are some of my favorite resources to continue learning about Bitcoin:</p>
-                <p>&nbsp;</p>
-                <p><strong>General resources:</strong></p>
-                <p>- <a href="https://learning.chaincode.com/" target="_blank">6 week virtual seminars</a> with Chaincode Labs</p></p>
-                <p>- <a href="https://aantonop.com/books/" target="_blank">Mastering Bitcoin</a> by Andreas Antonopoulos [<a href="https://github.com/bitcoinbook/bitcoinbook" target="_blank">free digital version</a>]</a></p>
-                <p>- <a href="https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line" target="_blank">Learning Bitcoin from the command line</a> by BlockChain Commons</a></p>
-                <p>- <a href="https://www.lopp.net/bitcoin-information.html" target="_blank">Every Bitcoin resource you could ever want</a> from podcasts, to videos, to statistics, to security, to art & music.</a></p>
-                <p>&nbsp;</p>
-                <p><strong>Bitcoin Core Development:</strong></p>
-                <p>- <a href="https://github.com/bitcoin/bitcoin" target="_blank">the Bitcoin Core code base on GitHub</a></p>
-                <p>- <a href="https://medium.com/@amitiu/onboarding-to-bitcoin-core-7c1a83b20365" target="_blank">Onboarding to Bitcoin Core</a> by <a href="https://github.com/amitiuttarwar">Amiti Uttarwar</a></p>
-                <p>- <a href="https://jonatack.github.io/articles" target="_blank">Articles on how to compile Bitcoin Core, review pull requests, and where to find more resources</a> by Jon Atack</p>
+                <!--
+                    Potential future routes: the mempool, mining. "a bitcoin journey" from a wallet to a block
+                -->
+                <div class="lesson final">
+                    <h2>That's all for now!</h2>
+                    <p>The balance is correct! We started with 2 bitcoin (one from Alice, and one from Bob), sent 1.5 to our friend Hal, and had 0.5 returned.</p>
+                    <p>Thank you for checking out this little proof-of-concept. If you wish to do it again, you can use the <code>reset</code> command.</p>
+                    <p>The fun doesn't have to stop here though! You're now ready to venture futher down the Bitcoin rabbit hole. Here are some of my favorite resources to continue learning about Bitcoin:</p>
+                    <p>&nbsp;</p>
+                    <p><strong>General resources:</strong></p>
+                    <p>- <a href="https://learning.chaincode.com/" target="_blank">6 week virtual seminars</a> with Chaincode Labs</p></p>
+                    <p>- <a href="https://aantonop.com/books/" target="_blank">Mastering Bitcoin</a> by Andreas Antonopoulos [<a href="https://github.com/bitcoinbook/bitcoinbook" target="_blank">free digital version</a>]</a></p>
+                    <p>- <a href="https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line" target="_blank">Learning Bitcoin from the command line</a> by BlockChain Commons</a></p>
+                    <p>- <a href="https://www.lopp.net/bitcoin-information.html" target="_blank">Every Bitcoin resource you could ever want</a> from podcasts, to videos, to statistics, to security, to art & music.</a></p>
+                    <p>&nbsp;</p>
+                    <p><strong>Bitcoin Core Development:</strong></p>
+                    <p>- <a href="https://github.com/bitcoin/bitcoin" target="_blank">the Bitcoin Core code base on GitHub</a></p>
+                    <p>- <a href="https://medium.com/@amitiu/onboarding-to-bitcoin-core-7c1a83b20365" target="_blank">Onboarding to Bitcoin Core</a> by <a href="https://github.com/amitiuttarwar">Amiti Uttarwar</a></p>
+                    <p>- <a href="https://jonatack.github.io/articles" target="_blank">Articles on how to compile Bitcoin Core, review pull requests, and where to find more resources</a> by Jon Atack</p>
+                </div>
             </div>
             <p id="schnorr"></p>
-        </div>
 
+            <div class="progressIndicator">
+                <strong><p id="lessonNumber" align="right"></p></strong>
+            </div>
+        </div>
     </div>
 
     <footer>
         <br />&nbsp;
         <p>Made with &#9829; by <a href="http://technicaldifficulties.io/">satsie</a>.</p>
-        <br />&nbsp;
-        <p><small><a href="https://github.com/satsie/trybitcoin" target="_blank"><img src="assets/GitHub-Mark-32px.png" height="25px"></a></small></p>
+        <p><small><a href="https://github.com/satsie/trybitcoin" target="_blank"><img src="assets/GitHub-Mark-32px.png" height="40px" style="padding-top: 15px;" ></a></small></p>
         <br />&nbsp;
     </footer>
 

@@ -147,6 +147,10 @@ function startLesson(newLessonNumber) {
 
   if (!$('.lesson' + currentLesson).length) {
     $('.final').show();
+    $("#lessonNumber").html('');
+  } else {
+    // Only display lesson progress if this isn't the final page
+    $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}`);
   }
 } // Increment the current lesson counter, save to local storage, and call
 // startLesson() to refresh the lesson page
@@ -323,7 +327,6 @@ $(function () {
   //  .js:                $("#demo").html("Hello, World!");
   // Fill in the JSON for lesson 8
   $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
-  console.log(helperMethods.rawSignedTx);
   $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`);
   const $console = $('.console');
   const $consolePrompt = $('.console-prompt');
@@ -458,6 +461,7 @@ module.exports = {
 // The lessons that expect the user to input JavaScript
 const javaScriptLessons = [2, 3, 4, 5, 6, 8];
 const bitcoinRpcLessons = [7, 9, 10];
+const totalNumberLessons = 10;
 
 function checkResult(lessonNumber, resultToCheck) {
   let checkedResult = resultToCheck;
@@ -535,6 +539,7 @@ module.exports = {
   bitcoinRpcLessons,
   checkResult,
   javaScriptLessons,
+  totalNumberLessons,
   userInputSanityCheck
 };
 
