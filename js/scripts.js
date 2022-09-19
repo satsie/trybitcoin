@@ -1,10 +1,9 @@
 var $ = require('jquery');
 const Buffer = require('safe-buffer').Buffer;
 const schnorr = require('bip-schnorr');
-const bitcoinjs = require('bitcoinjs-lib');
 const stringUtils = require('./stringUtils');
 const constants = require('./constants');
-const helperMethods = require('./helperMethods');
+const lessonLogic = require('./lessonLogic');
 const validation = require('./validation');
 
 let mostRecentCommand;
@@ -13,7 +12,7 @@ let publicKey;
 let message;
 let signature;
 // For lesson 8
-let transaction = helperMethods.mockTxToSign;
+let transaction = lessonLogic.mockTxToSign;
 
 // store the lesson number in local storage so the user can leave and come back
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
@@ -123,32 +122,20 @@ function signMessage(privateKeyHex, messageString) {
 }
 
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
-    return helperMethods.verifySignature(aPublicKeyHex, aMessage, aSignature);
+    return lessonLogic.verifySignature(aPublicKeyHex, aMessage, aSignature);
 }
 
 function hash(inputString) {
-    return helperMethods.hash(inputString);
+    return lessonLogic.hash(inputString);
 }
 
 // The fact that this accepts an address is misleading. Since we can't use 32 byte Schnorr
-// friendly keys (see below), we just throw away whatever the user provides. The parameter
+// friendly keys (see helper method), we just throw away whatever the user provides. The parameter
 // is here to make the user feel like they are passing in a pub key, since one is required
 // for address creation.
 function createAddress(aPublicKey) {
-    // want to make a taproot address, but that requires the tiny-secp256k1 lib which
-    // uses WASM. Couldn't find a way to add WASM support with Gulp. It appears do-able
-    // with Webpack, but that's going to require some effot.
-    // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1746#issuecomment-968371375
-    // https://github.com/bitcoinjs/tiny-secp256k1/blob/master/examples/react-app/webpack.config.js
-
-    // For now, create the address with a (new) EC keypair. Keypair is hardcoded because in order
-    // to randomize it we'd need the same tiny-secp256k1 lib mentioned above
-    const ecPublicKey = '03c94e02d923a42bf6011f55ec52580c1ca4bbee5d7aeccf7aa8adc62d93478130';
-    // just in case this is needed later
-    const ecPrivateKey = 'd827067318c514f1ff19db230f285fb5f49995a850bbb7a24545eac57957fbb6';
-
-    const { address } = bitcoinjs.payments.p2pkh({ pubkey: Buffer.from(ecPublicKey, 'hex') });
-    return {address};
+    // TODO can return an error if the user does not provide a public key
+    return lessonLogic.createAddress();
 }
 
 // This is not actually signing a transaction, but it would be cool to implement in a future version
@@ -167,7 +154,7 @@ async function evaluateCode(userInput, lessonNumber) {
 
     // If this is not a JavaScript lesson, this is a bitcoin-cli lesson
     if (validation.bitcoinRpcLessons.includes(lessonNumber)) {
-        return evaluateBitcoinRPC(userInput, lessonNumber);
+        return lessonLogic.evaluateBitcoinRPC(userInput, lessonNumber);
     }
 
     // Some protections for blindly feeding user input into eval()
@@ -186,38 +173,6 @@ async function evaluateCode(userInput, lessonNumber) {
     }
 
     return returnObject;
-}
-
-// Mock bitcoin-cli commands. At the moment there are no plans to do anything more involved
-// than this (like running a regtest Docker container)
-function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
-    const expectedInput = {
-        7: 'bitcoin-cli getbalance',
-        9: `bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`,
-        10: 'bitcoin-cli getbalance'
-    };
-
-    const lessonAnswers = {
-        7: "1.00000000",
-        9: helperMethods.mockTxId,
-        10: "0.50000000"
-    }
-
-    if (expectedInput[lessonNumber] === userInputCommand) {
-        console.log('you did it! returning happy face');
-        return {
-            success: true,
-            result: lessonAnswers[lessonNumber]
-        };
-    }
-
-    return {
-        success: false,
-        result: {
-            error: `Error trying to execute Bitcoin Core RPC command. Please type '${expectedInput[lessonNumber]}' exactly`
-        }
-    };
-
 }
 
 function printResult($userInput, $consolePrompt, isError, aResult) {
@@ -254,8 +209,8 @@ $(function() {
     //  .js:                $("#demo").html("Hello, World!");
 
     // Fill in the JSON for lesson 8
-    $("#lesson8UnsignedTx").html(JSON.stringify(helperMethods.mockTxToSign, null, 2));
-    $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${helperMethods.rawSignedTx}`);
+    $("#lesson8UnsignedTx").html(JSON.stringify(lessonLogic.mockTxToSign, null, 2));
+    $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${lessonLogic.rawSignedTx}`);
 
     const $console = $('.console');
     const $consolePrompt = $('.console-prompt');
