@@ -51,3 +51,4 @@ Helpful commands:
 ## License
 
 Try Bitcoin is released under the MIT license.
+
