@@ -8,9 +8,11 @@ Try Bitcoin is an interactive Bitcoin tutorial inspired by and forked from [Try 
 
 It illustrates Bitcoin fundamentals using JavaScript and some Bitcoin Core RPC commands. Programming experience is helpful, but not required.
 
-Because this is targeted towards beginners, many low level details like address types, segwit, and fee calculation are not covered. Many of the exercises involve mocked data to some degree. In an effort to not overwhelm the reader, some things have been **extremely simplified**. For example, transaction details such as sequence number have been removed.
+Because this is targeted towards beginners, many low level details like address types, segwit, and fee calculation are not covered. Many of the exercises involve mocked data to some degree. In an effort to not overwhelm the reader, some things have been **extremely simplified**. For example, transaction details such as sequence numbers have been removed.
 
-This project is not designed to teach exact commands and libraries. Many of the commands you see here are custom to this code base, and will not work quite the same outside of it. This material is intented to help users understand how Bitcoin works, and provide them with the context needed to go a level deeper. After this tutorial, students that wish to continue their Bitcoin journey should feel comfortable enough picking up a  technical book like Mastering Bitcoin or diving into more a comprehensive resource like [Learn Me a Bitcoin](https://learnmeabitcoin.com/).
+This project is not designed to teach exact commands and libraries. Many of the commands you see here are custom to this code base, and will not work quite the same outside of it. This material is intended to help users understand how Bitcoin works, and provide them with the context needed to go a level deeper. 
+
+After this tutorial, students that wish to continue their Bitcoin journey should feel comfortable enough picking up a  technical book like Mastering Bitcoin or diving into more a comprehensive resource like [Learn Me a Bitcoin](https://learnmeabitcoin.com/).
 
 ## Warning!
 

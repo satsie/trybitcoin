@@ -70,14 +70,14 @@ function createAddress() {
 
 function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
   const expectedInput = {
-    7: 'bitcoin-cli getbalance',
-    9: `bitcoin-cli sendrawtransaction ${rawSignedTx}`,
-    10: 'bitcoin-cli getbalance'
+    6: 'bitcoin-cli getbalance',
+    8: `bitcoin-cli sendrawtransaction ${rawSignedTx}`,
+    9: 'bitcoin-cli getbalance'
   };
   const lessonAnswers = {
-    7: "1.00000000",
-    9: mockTxId,
-    10: "0.50000000"
+    6: "1.00000000",
+    8: mockTxId,
+    9: "0.50000000"
   }; // case sensitive by design
 
   if (expectedInput[lessonNumber] === userInputCommand) {
@@ -150,11 +150,11 @@ let mostRecentCommand;
 let privateKey;
 let publicKey;
 let message;
-let signature; // For lesson 8
+let signature; // For lesson 7
 
 let transaction = lessonLogic.mockTxToSign; // store the lesson number in local storage so the user can leave and come back
 
-let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
+let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 0;
 let localDataString = localStorage.getItem('localData') || '';
 let localData = {};
 
@@ -195,13 +195,19 @@ function startLesson(newLessonNumber) {
   $('.lesson' + newLessonNumber).show(); // persist the new lesson number
 
   currentLesson = newLessonNumber;
-  localStorage.setItem('currentLesson', currentLesson); // If there is no lesson to show, display the final page
+  localStorage.setItem('currentLesson', currentLesson);
+  let finalLesson = false; // If there is no lesson to show, display the final page
 
   if (!$('.lesson' + currentLesson).length) {
     $('.final').show();
+    finalLesson = true;
+  } // Progress indicator
+  // Do not show it for lesson 0 (welcome page), or the final page
+
+
+  if (newLessonNumber === 0 || finalLesson === true) {
     $("#lessonNumber").html('');
   } else {
-    // Only display lesson progress if this isn't the final page
     $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}`);
   }
 } // Increment the current lesson counter, save to local storage, and call
@@ -331,9 +337,9 @@ $(function () {
   // all custom jQuery will go here
   //  .html:              <p id="demo"></p>
   //  .js:                $("#demo").html("Hello, World!");
-  // Fill in the JSON for lesson 8
-  $("#lesson8UnsignedTx").html(JSON.stringify(lessonLogic.mockTxToSign, null, 2));
-  $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${lessonLogic.rawSignedTx}`);
+  // Fill in the JSON for lesson 7
+  $("#lesson7UnsignedTx").html(JSON.stringify(lessonLogic.mockTxToSign, null, 2));
+  $("#lesson8BroadcastTx").val(`bitcoin-cli sendrawtransaction ${lessonLogic.rawSignedTx}`);
   const $console = $('.console');
   const $consolePrompt = $('.console-prompt');
   const $userInput = $('.console-input'); // Focus on the user input box
@@ -365,15 +371,15 @@ $(function () {
 
       if (lowercaseUserInputString.includes('reset')) {
         // hide the current lesson by resetting the CSS
-        window.location.reload(); // reset to lesson 1
+        window.location.reload(); // reset to lesson 0
 
-        currentLesson = 1;
+        currentLesson = 0;
         localStorage.setItem('currentLesson', currentLesson);
         startLesson(currentLesson); // clear the user input
 
         $userInput.val(''); // clear the rest of the data stored locally
 
-        localStorage.setItem('localData', {}); // Reset the mock transaction for lesson 8. Can move this into a
+        localStorage.setItem('localData', {}); // Reset the mock transaction for lesson 7. Can move this into a
         // generalized reset method in case other lesson data needs to be
         // cleaned up
 
@@ -399,9 +405,9 @@ $(function () {
       let result = '';
       let error = true;
       const sanityCheckResult = validation.userInputSanityCheck(currentLesson, lowercaseUserInputString);
-      result = sanityCheckResult; // Special case for lesson 1
+      result = sanityCheckResult; // Special case for lesson 0
 
-      if (sanityCheckResult === true && currentLesson === 1) {
+      if (sanityCheckResult === true && currentLesson === 0) {
         error = false;
         result = ''; // move onto the next lesson automatically
 
@@ -465,15 +471,14 @@ module.exports = {
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"buffer":83}],5:[function(require,module,exports){
 // The lessons that expect the user to input JavaScript
-const javaScriptLessons = [2, 3, 4, 5, 6, 8];
-const bitcoinRpcLessons = [7, 9, 10];
+const javaScriptLessons = [1, 2, 3, 4, 5, 7];
+const bitcoinRpcLessons = [6, 8, 9];
 const totalNumberLessons = 10;
 
 function checkResult(lessonNumber, resultToCheck) {
   let checkedResult = resultToCheck;
 
-  if (lessonNumber === 5) {
-    console.log(resultToCheck.result.hash);
+  if (lessonNumber === 4) {
     const cypherpunksWriteCodeHash = '42cc22190b177e5c48e32fe87c214d88eb21cac7780aad65b8b816d77cf22820';
 
     if (resultToCheck.result.hash !== cypherpunksWriteCodeHash) {
@@ -491,31 +496,31 @@ function checkResult(lessonNumber, resultToCheck) {
 
 function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
   const errorResponse = {
-    lesson1: 'Please type \'start\'',
-    lesson2: 'Please type \'generateKeys()\'',
-    lesson3: 'Please invoke the \'signMessage\' function',
-    lesson4: 'Please invoke the \'verifySignature\' function',
-    lesson5: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
-    lesson6: 'Please type \'createAddress()\'',
-    lesson7: 'Please type \'bitcoin-cli getbalance\'',
-    lesson8: 'Please type \'signTransaction(privateKey, transaction)\'',
-    lesson9: 'Please copy and paste all of the \'bitcoin-cli sendrawtransaction\' command, including the giant string of letters and numbers. That is the transaction in hex format, and it is required.',
-    lesson10: 'Please type \'bitcoin-cli getbalance\''
+    lesson0: 'Please type \'start\'',
+    lesson1: 'Please type \'generateKeys()\'',
+    lesson2: 'Please invoke the \'signMessage\' function',
+    lesson3: 'Please invoke the \'verifySignature\' function',
+    lesson4: 'Please invoke the \'hash\' function with the input \'Cypherpunks write code\'',
+    lesson5: 'Please type \'createAddress()\'',
+    lesson6: 'Please type \'bitcoin-cli getbalance\'',
+    lesson7: 'Please type \'signTransaction(privateKey, transaction)\'',
+    lesson8: 'Please copy and paste all of the \'bitcoin-cli sendrawtransaction\' command, including the giant string of letters and numbers. That is the transaction in hex format, and it is required.',
+    lesson9: 'Please type \'bitcoin-cli getbalance\''
   }; // lowercase because the input is normalized before it gets to this method
 
   const expectedCommandBeginning = {
-    lesson1: 'start',
-    lesson2: 'generatekeys(',
-    lesson3: 'signmessage(',
-    lesson4: 'verifysignature(',
-    lesson5: 'hash(',
-    lesson6: 'createaddress(',
-    lesson7: 'bitcoin-cli getbalance',
-    lesson8: 'signtransaction(',
-    lesson9: 'bitcoin-cli sendrawtransaction',
-    lesson10: 'bitcoin-cli getbalance'
+    lesson0: 'start',
+    lesson1: 'generatekeys(',
+    lesson2: 'signmessage(',
+    lesson3: 'verifysignature(',
+    lesson4: 'hash(',
+    lesson5: 'createaddress(',
+    lesson6: 'bitcoin-cli getbalance',
+    lesson7: 'signtransaction(',
+    lesson8: 'bitcoin-cli sendrawtransaction',
+    lesson9: 'bitcoin-cli getbalance'
   }; // It's ok if the user wants to put a semicolon at the end, but remove it to
-  // make validation a little simpler
+  // make validation simpler
 
   if (aLowercaseInputString.endsWith(';')) {
     aLowercaseInputString = aLowercaseInputString.slice(0, -1);

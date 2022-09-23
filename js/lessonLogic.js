@@ -57,15 +57,15 @@ function createAddress() {
 // than this (like running a regtest Docker container)
 function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
   const expectedInput = {
-      7: 'bitcoin-cli getbalance',
-      9: `bitcoin-cli sendrawtransaction ${rawSignedTx}`,
-      10: 'bitcoin-cli getbalance'
+      6: 'bitcoin-cli getbalance',
+      8: `bitcoin-cli sendrawtransaction ${rawSignedTx}`,
+      9: 'bitcoin-cli getbalance'
   };
 
   const lessonAnswers = {
-      7: "1.00000000",
-      9: mockTxId,
-      10: "0.50000000"
+      6: "1.00000000",
+      8: mockTxId,
+      9: "0.50000000"
   }
 
   // case sensitive by design

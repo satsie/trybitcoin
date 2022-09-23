@@ -11,11 +11,11 @@ let privateKey;
 let publicKey;
 let message;
 let signature;
-// For lesson 8
+// For lesson 7
 let transaction = lessonLogic.mockTxToSign;
 
 // store the lesson number in local storage so the user can leave and come back
-let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 1;
+let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 0;
 let localDataString = localStorage.getItem('localData') || '';
 let localData = {};
 try {
@@ -59,12 +59,18 @@ function startLesson(newLessonNumber) {
     currentLesson = newLessonNumber;
     localStorage.setItem('currentLesson', currentLesson);
 
+    let finalLesson = false;
     // If there is no lesson to show, display the final page
     if (!$('.lesson' + currentLesson).length) {
         $('.final').show();
+        finalLesson = true;
+    }
+
+    // Progress indicator
+    // Do not show it for lesson 0 (welcome page), or the final page
+    if (newLessonNumber === 0 || finalLesson === true) {
         $("#lessonNumber").html('');
     } else {
-        // Only display lesson progress if this isn't the final page
         $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}`);
     }
 
@@ -208,9 +214,9 @@ $(function() {
     //  .html:              <p id="demo"></p>
     //  .js:                $("#demo").html("Hello, World!");
 
-    // Fill in the JSON for lesson 8
-    $("#lesson8UnsignedTx").html(JSON.stringify(lessonLogic.mockTxToSign, null, 2));
-    $("#lesson9BroadcastTx").val(`bitcoin-cli sendrawtransaction ${lessonLogic.rawSignedTx}`);
+    // Fill in the JSON for lesson 7
+    $("#lesson7UnsignedTx").html(JSON.stringify(lessonLogic.mockTxToSign, null, 2));
+    $("#lesson8BroadcastTx").val(`bitcoin-cli sendrawtransaction ${lessonLogic.rawSignedTx}`);
 
     const $console = $('.console');
     const $consolePrompt = $('.console-prompt');
@@ -249,8 +255,8 @@ $(function() {
                 // hide the current lesson by resetting the CSS
                 window.location.reload();
 
-                // reset to lesson 1
-                currentLesson = 1;
+                // reset to lesson 0
+                currentLesson = 0;
                 localStorage.setItem('currentLesson', currentLesson);
                 startLesson(currentLesson);
 
@@ -260,7 +266,7 @@ $(function() {
                 // clear the rest of the data stored locally
                 localStorage.setItem('localData', {});
 
-                // Reset the mock transaction for lesson 8. Can move this into a
+                // Reset the mock transaction for lesson 7. Can move this into a
                 // generalized reset method in case other lesson data needs to be
                 // cleaned up
                 transaction.inputs[0].scriptSig = "";
@@ -291,8 +297,8 @@ $(function() {
             const sanityCheckResult = validation.userInputSanityCheck(currentLesson, lowercaseUserInputString)
             result = sanityCheckResult;
 
-            // Special case for lesson 1
-            if (sanityCheckResult === true && currentLesson === 1) {
+            // Special case for lesson 0
+            if (sanityCheckResult === true && currentLesson === 0) {
                 error = false;
                 result = '';
 
