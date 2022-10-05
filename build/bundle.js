@@ -208,7 +208,7 @@ function startLesson(newLessonNumber) {
   if (newLessonNumber === 0 || finalLesson === true) {
     $("#lessonNumber").html('');
   } else {
-    $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}`);
+    $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}&emsp;&ensp;`);
   }
 } // Increment the current lesson counter, save to local storage, and call
 // startLesson() to refresh the lesson page

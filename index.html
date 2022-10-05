@@ -17,29 +17,17 @@
 
     <div class="main">
 
-        <div class="console">
-            <div class="console-text">
-                <p class="console-header">Enter commands here</p>
-                <ul>
-                    <li class="console-input-container">
-                        <label>
-                            <span class="console-prompt">&gt; </span>
-                            <input class="console-input" spellcheck="false"/>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
         <div class="instructions">
             <div class="lessons">
                 <div class="lesson lesson0">
                     <h2>Welcome!</h2>
                     <p>This is an interactive tutorial for beginners who want to learn more about the technical side of Bitcoin. Coding experience is helpful, but not required.</p>
+                    <p class="note">This takes about 20 minutes to complete. It's designed for desktop, so I beg you to please not try this on mobile.</p>
                     <p>Try Bitcoin uses popular Bitcoin JavaScript libraries like <a href='https://github.com/bitcoinjs/bitcoinjs-lib' target="_blank">bitcoinjs</a> and <a href='https://github.com/guggero/bip-schnorr' target="_blank">bip-schnorr</a> to explain different parts of system. It also introduces a few <a href="https://bitcoin.org/en/bitcoin-core/features/user-interface#cli" target="_blank">Bitcoin Core CLI</a> commands.</p>
                     <!-- <p>If you get stuck at any point in the tutorial, run the <code>help</code> command.</p> -->
                     <p>Some concepts have been simplified for educational purposes but don't let that discourage you! The goals are for participants to gain a better understanding of how Bitcoin works, and to walk away with the confidence to tackle the many books, courses, and websites that take a deeper dive.</p>
-                    <p>On the left we have something that's called a console. You type commands into it and press 'Enter' on your keyboard. After that, the program returns a response.</p>
+                    <p>On the left we have something that's called a <nobr>📟 <strong>console</strong> 📟</nobr>. You type commands into it and press 'Enter' on your keyboard. After that, the program returns a response.</p>
+                    <hr class="dashed">
                     <p>To begin, type <code>start</code> into the console.</p>
                 </div>
 
@@ -49,7 +37,7 @@
                     <p>For advanced situations, bitcoin can be assigned to multiple public keys. Scripts make this possible, but we won't be covering them.</p>
                     <p>For now, it's okay to correlate bitcoin ownership with a single public key.</p>
                     <p>Every public key has a corresponding <nobr>&#x1F511; <strong>private key</strong> &#x1F511;</nobr>.</p>
-                    <p>The public key is meant to be shared. The private key should never be revealed to anyone else. </p>
+                    <p>While the public key can be shared, the private key should never be revealed to anyone else. </p>
                     <p>Let's start by generating a pair of public and private keys to see what they look like.</p>
                     <p>Type <code>generateKeys()</code> into the console to create a keypair.</p>
                 </div>
@@ -194,24 +182,49 @@
                     <p>Thank you for checking out this little tutorial. If you wish to do it again, you can use the <code>reset</code> command.</p>
                     <p>The fun doesn't have to stop here! You're now ready to venture futher down the rabbit hole. Here are some of my favorite resources to continue learning about Bitcoin:</p>
                     <p><strong>General resources:</strong></p>
-                    <p>- <a href="https://hellobitco.in/" target="_blank">Hello Bitcoin</a></p>
-                    <p>- <a href="http://thebitcoinrabbi.com" target="_blank">Bitcoin Money: A Tale of Bitville Discovering Good Money</a> by Michael Caras</p>
-                    <p>- <a href="https://learning.chaincode.com/" target="_blank">6 week virtual seminars</a> with Chaincode Labs</p></p>
-                    <p>- <a href="https://aantonop.com/books/" target="_blank">Mastering Bitcoin</a> by Andreas Antonopoulos [<a href="https://github.com/bitcoinbook/bitcoinbook" target="_blank">free digital version</a>]</a></p>
-                    <p>- <a href="https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line" target="_blank">Learning Bitcoin from the command line</a> by BlockChain Commons</a></p>
-                    <p>- <a href="https://www.lopp.net/bitcoin-information.html" target="_blank">Every Bitcoin resource you could ever want</a> from podcasts, to videos, to statistics, to security, to art & music.</a></p>
+                    <p>- <a href="https://hellobitco.in/" target="_blank">Hello Bitcoin:</a> Your one stop shop for the basics. Covers a wide range of topics from economic empowerment and financial freedom to energy consumption and the peer-to-peer network. If you want to learn more about Bitcoin, but aren't jazzed about looking at more technical stuff. This is the place for you!</p>
+                    <p>- <a href="http://thebitcoinrabbi.com" target="_blank">Bitcoin Money: A Tale of Bitville Discovering Good Money</a> by Michael Caras: This is an adorable childern's book about Bitcoin, but I recommend it to all ages!</p>
+                    <p>- <a href="https://learning.chaincode.com/" target="_blank">6 week virtual seminars</a> with Chaincode Labs: Need some external motivation? Want to learn with friends? Chaincode makes it fun and rewarding! These seminars are for all levels, you just need to be able to commit to 4-6 hours a week.</p>
+                    <p>- <a href="https://aantonop.com/books/" target="_blank">Mastering Bitcoin</a> by Andreas Antonopoulos [<a href="https://github.com/bitcoinbook/bitcoinbook" target="_blank">free digital version</a>]: This is the OG Bitcoin textbook and a must read for anyone that wants to build on top of or contribute to Bitcoin.</p>
+                    <p>- <a href="https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line" target="_blank">Learning Bitcoin from the command line</a> by BlockChain Commons: Are you a command line wizard? Does the thought of using a GUI make you yawn? Do you refuse to go anywhere unless you can take your shell candy with you? BlockChain Commons is here for you. Learn your way through Bitcoin without ever having to leave the comfort of your terminal!</p>
+                    <p>- Still haven't found something for you? <a href="https://www.lopp.net/bitcoin-information.html" target="_blank">https://bitcoin.page</a> has every type of Bitcoin resource you could ever want on every facet of Bitcoin you can think of. From podcasts, to videos, to statistics, to security, to art & music, this page it all. I have yet to see a quality resource that isn't on this comprehensive list, but if you manage to find something missing, PRs (pull requests) are always welcome!</a></p>
                     <p><strong>Bitcoin Core Development:</strong></p>
-                    <p>- <a href="https://github.com/bitcoin/bitcoin" target="_blank">the Bitcoin Core code base on GitHub</a></p>
-                    <p>- <a href="https://medium.com/@amitiu/onboarding-to-bitcoin-core-7c1a83b20365" target="_blank">Onboarding to Bitcoin Core</a> by <a href="https://github.com/amitiuttarwar">Amiti Uttarwar</a></p>
-                    <p>- <a href="https://jonatack.github.io/articles" target="_blank">Articles on how to compile Bitcoin Core, review pull requests, and where to find more resources</a> by Jon Atack</p>
+                    <p> For those that like drinking from the firehose and being thrown off the deep end, here's where you can go to learn more about Bitcoin Core.</p>
+                    <p>- <a href="https://github.com/bitcoin/bitcoin" target="_blank">the Bitcoin Core code base on GitHub</a>: Start here and download a copy of the code! The <code>docs</code> directory is rich with information and developer productivity notes</p>
+                    <p>- <a href="https://medium.com/@amitiu/onboarding-to-bitcoin-core-7c1a83b20365" target="_blank">Onboarding to Bitcoin Core</a> by <a href="https://github.com/amitiuttarwar">Amiti Uttarwar</a>: Amiti is like the Bitcoin Core BFF we all wish we had. Let her walk you through the steps you can take to become an active contributor</p>
+                    <p>- <a href="https://jonatack.github.io/articles" target="_blank">Articles on how to compile Bitcoin Core, review pull requests, and where to find more resources</a> by Jon Atack: One of the best ways to contribute is by reviewing pull requests. Jon holds your hand through some of the less than obvious aspects of this process. Bookmark these pages because you will be coming back to them time and time again!</p>
+                    <p>- The <a href="https://obc.256k1.dev/">Onboarding to Bitcoin Core</a> book: Ready to know EVERYTHING about Bitcoin Core? Well, this book isn't quite everything, but it feels like it. This is a fabulous guide for anyone trying to understand more of the big picture, with plenty of opportunities to drill down into the areas that they find most exciting.</p>
                 </div>
             </div>
             <p id="schnorr"></p>
 
-            <div class="progressIndicator">
-                <strong><p id="lessonNumber" align="right"></p></strong>
+            <div class="lessonFooter">
+                <!-- <div class="navigationButtonArea">
+                    <center><button>Back</button></center>
+                </div> -->
+                <div class="progressIndicator">
+                    <strong><p id="lessonNumber" align="center"></p></strong>
+                </div>
+                <!-- <div class="navigationButtonArea">
+                   <center><button>Next</button></center>
+                </div> -->
             </div>
         </div>
+
+        <div class="console">
+            <div class="console-text">
+                <p class="console-header">Enter commands here</p>
+                <ul>
+                    <li class="console-input-container">
+                        <label>
+                            <span class="console-prompt">&gt; </span>
+                            <input class="console-input" spellcheck="false"/>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
     </div>
 
     <footer>

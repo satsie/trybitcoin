@@ -12,6 +12,9 @@
  @codeColor: #222;
  @orangeColor: #ed602b;
  @lightorangeColor: #f3baa6;
+ @retroGreenColor: #B7CF99;
+ @retroBlue: #087B75;
+ @retroRed: #C6460F;
 
  
  // http://www.paulirish.com/2012/box-sizing-border-box-ftw/
@@ -194,6 +197,20 @@
             font-weight: bold;
         }
 
+        p.note {
+            background-color: @bgAccent;
+            border-left: solid 4px @retroGreenColor;
+            line-height: 18px;
+            overflow: hidden;
+            padding: 12px;
+        }
+
+       /* Dashed border */
+        hr.dashed {
+            border-style: none none dashed;
+            color: @orangeColor;
+        }
+
         .lessons {
             padding: 0 50px 0 50px;
             overflow: auto;
@@ -202,6 +219,7 @@
                 font-size: 18pt;
                 font-weight: 600;
                 margin-bottom: 20px;
+                color: @orangeColor;
             }
     
             p, pre {
@@ -241,12 +259,43 @@
             }
         }
 
-        .progressIndicator {
-            padding: 20px 0 0 50px;
-            color: @orangeColor;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-         }
+        .lessonFooter {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+            width: calc(~"100% - 60px");
+            min-height: 50px;
+            margin: 0 auto;
+        
+            & > div {
+                flex: 1;
+            }
+        
+            .navigationButtonArea {
+                padding: 20px 10px 0 10px;
+                font-size: 12px;
+            }
+
+            button {
+                background-color: @orangeColor;
+                color: white;
+                font-family: 'Courier New', Courier, monospace;
+                border: none
+            }
+
+            button:hover {
+                transform: translate(2px, 2px);
+                box-shadow: 2px 2px @retroGreenColor;
+            }
+
+            .progressIndicator {
+                padding: 20px 0 0 50px;
+                color: @orangeColor;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 12px;
+             }
+        }
+
     }
 
  }
