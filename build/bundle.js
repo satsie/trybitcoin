@@ -374,8 +374,9 @@ $(function () {
     $userInput.trigger('focus');
   });
   $userInput.on('keydown', async function (e) {
-    const userInputString = $('.console-input').val();
-    const lowercaseUserInputString = userInputString.toLowerCase();
+    const userInputString = $('.console-input').val(); // Normalize the user input by making it all lowercase and trimming leading and trailing whitespace
+
+    const lowercaseUserInputString = userInputString.toLowerCase().trim();
 
     if (e.key === constants.keyMap.ENTER) {
       // save the most recent command

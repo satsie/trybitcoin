@@ -260,7 +260,9 @@ $(function() {
 
     $userInput.on('keydown', async function (e) {
         const userInputString = $('.console-input').val();
-        const lowercaseUserInputString = userInputString.toLowerCase();
+
+        // Normalize the user input by making it all lowercase and trimming leading and trailing whitespace
+        const lowercaseUserInputString = userInputString.toLowerCase().trim();
 
         if (e.key === constants.keyMap.ENTER) {
             // save the most recent command
