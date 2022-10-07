@@ -131,6 +131,7 @@
          border-style: dashed;
          border-color: @orangeColor;
          border-width: thin;
+         overflow-y: scroll;
  
         .console-header {
             color: @orangeColor;
@@ -276,20 +277,20 @@
                 font-size: 12px;
             }
 
-            button {
+            button:enabled {
                 background-color: @orangeColor;
                 color: white;
                 font-family: 'Courier New', Courier, monospace;
                 border: none
             }
 
-            button:hover {
+            button:hover:enabled {
                 transform: translate(2px, 2px);
                 box-shadow: 2px 2px @retroGreenColor;
             }
 
             .progressIndicator {
-                padding: 20px 0 0 50px;
+                padding: 20px 0 0 0;
                 color: @orangeColor;
                 font-family: 'Courier New', Courier, monospace;
                 font-size: 12px;

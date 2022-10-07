@@ -55,6 +55,9 @@ function startLesson(newLessonNumber) {
     // Show the new lesson
     $('.lesson' + newLessonNumber).show();
 
+    // auto scroll to the top of the next lesson
+    $('.lessons').scrollTop(0);
+
     // persist the new lesson number
     currentLesson = newLessonNumber;
     localStorage.setItem('currentLesson', currentLesson);
@@ -66,12 +69,15 @@ function startLesson(newLessonNumber) {
         finalLesson = true;
     }
 
-    // Progress indicator
+    // Progress indicator and next button
     // Do not show it for lesson 0 (welcome page), or the final page
     if (newLessonNumber === 0 || finalLesson === true) {
         $("#lessonNumber").html('');
+        $("#nextButton").prop("hidden", true);
     } else {
         $("#lessonNumber").html(`${newLessonNumber} / ${validation.totalNumberLessons}`);
+        $("#nextButton").prop("hidden", false);
+        $("#nextButton").prop("disabled", true);
     }
 
 
@@ -221,9 +227,18 @@ $(function() {
     const $console = $('.console');
     const $consolePrompt = $('.console-prompt');
     const $userInput = $('.console-input');
+    const $nextButton = $('#nextButton');
+    const $lessonArea = $('.lessons');
 
     // Focus on the user input box
     $userInput.trigger('focus');
+
+    // auto scroll to the bottom when the console starts to fill
+    const consoleHeight = $console[0].scrollHeight;
+    $console.scrollTop(consoleHeight);
+
+    // auto scroll lesson to the top
+    $lessonArea.scrollTop(0);
 
     if (currentLesson !== 1) {
         // hide lesson 1, which is turned on by default
@@ -231,6 +246,12 @@ $(function() {
 
         startLesson(currentLesson);
     }
+
+    // When the next button is pressed, advance the lesson and disable the button
+    $nextButton.on('click', function() {
+        advanceLesson();
+        $nextButton.prop("disabled", true);
+    });
 
     // If the user clicks anywhere in the console box, focus the cursor on the input line
     $console.on('click', function (e) {
@@ -311,13 +332,20 @@ $(function() {
                 const checkedResult = validation.checkResult(currentLesson, evalResult);
                 result = JSON.stringify(checkedResult.result, undefined, 2);
 
+                // If the user had the right answer,
                 if (checkedResult.success === true) {
                     error = false;
-                    advanceLesson();
+                    
+                    // Turn on the next button and only advance the lesson if the user presses it
+                    $nextButton.prop("disabled", false);
                 }
             }
 
             printResult($userInput, $consolePrompt, error, result);
+
+            // Auto scroll to the bottom of the console
+            const newConsoleHeight = $console[0].scrollHeight;
+            $console.scrollTop(newConsoleHeight);
         }
 
         // enter the most recent command if the user presses the up arrow
