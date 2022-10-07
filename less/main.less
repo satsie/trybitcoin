@@ -204,6 +204,7 @@
             line-height: 18px;
             overflow: hidden;
             padding: 12px;
+            font-style: italic;
         }
 
        /* Dashed border */
@@ -216,13 +217,27 @@
             padding: 0 50px 0 50px;
             overflow: auto;
 
+            h1 {
+                font-size: 18pt;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: @retroBlue;
+            }
+
             h2 {
                 font-size: 18pt;
                 font-weight: 600;
                 margin-bottom: 20px;
                 color: @orangeColor;
             }
-    
+
+            h3 {
+                font-size: 14pt;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: @orangeColor;
+            }
+
             p, pre {
                 line-height: 1.4;
                 margin-bottom: 10px;
@@ -231,8 +246,10 @@
             li {
                 line-height: 1.4;
                 margin-bottom: 5px;
+                list-style: circle;
+                margin-left: 20px;
             }
-    
+
             code {
                 font-family: monospace;
                 white-space: pre;
