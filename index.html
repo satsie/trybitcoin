@@ -28,7 +28,7 @@
                     <p>Some concepts have been simplified for educational purposes but don't let that discourage you! The goals are for participants to gain a better understanding of how Bitcoin works, and to walk away with the confidence to tackle the many books, courses, and websites that take a deeper dive.</p>
                     <p>On the right we have something that's called a <nobr>📟 <strong>console</strong> 📟</nobr>. You type commands into it and press 'Enter' on your keyboard. After that, the program returns a response.</p>
                     <hr class="dashed">
-                    <p>To begin, type <code>start</code> into the console.</p>
+                    <p>To begin, type <consoleCommand>start</consoleCommand> into the console.</p>
                 </div>
 
                 <div class="lesson lesson1">
@@ -41,7 +41,7 @@
                     <p>While the public key can be shared, the private key should never be revealed to anyone else. </p>
                     <hr class="dashed">
                     <p>Let's start by generating a pair of public and private keys to see what they look like.</p>
-                    <p>Type <code>generateKeys()</code> into the console to create a keypair.</p>
+                    <p>Type <consoleCommand>generateKeys()</consoleCommand> into the console to create a keypair.</p>
                 </div>
 
                 <div class="lesson lesson2">
@@ -54,7 +54,7 @@
                     <p>This means you can digitally sign a piece of data, and anyone who has your public key can verify the signature really came from you.</p>
                     <hr class="dashed">
                     <p>The private key you just generated has been saved to a variable called <code>privateKey</code>. Now, anytime you type <code>privateKey</code>, the program will know you are referring to that long string of letters and numbers that represent your private key.</p>
-                    <p>Let's create a digital signature by signing a message. Type <code>signMessage(privateKey, 'any message')</code> into the console. You can change the <code>any message</code> part to something more exciting (just make sure you keep the quotation marks!).</p>
+                    <p>Let's create a digital signature by signing a message. Type <consoleCommand>signMessage(privateKey, 'any message')</consoleCommand> into the console. You can change the <consoleCommand>any message</consoleCommand> part to something more exciting (just make sure you keep the quotation marks!).</p>
                     <p>After you press enter, the digital signature will be returned.</p>
                 </div>
 
@@ -63,7 +63,7 @@
                     <p>Nice work! We've created a digital signature using the private key. Now we can use the corresponding public key to verify the signature's authenticity.</p>
                     <hr class="dashed">
                     <p>Similar to the previous lesson, this tutorial has automatically saved the <code>publicKey</code>,<code>message</code> and <code>signature</code> values to variables of the same name.</p>
-                    <p>That means all you need to do is type <code>verifySignature(publicKey, message, signature)</code> to verify that the signature came from the private key we think it did.</p>
+                    <p>That means all you need to do is type <consoleCommand>verifySignature(publicKey, message, signature)</consoleCommand> to verify that the signature came from the private key we think it did.</p>
                 </div>
 
                 <div class="lesson lesson4">
@@ -76,7 +76,7 @@
                     <p>It all starts with a function, a <strong>hash function</strong>, that always returns outputs, or <strong>hashes</strong> of a certain size. This is true no matter how big or small the input is.</p>
                     <ul>
                         <li>Just like fingerprints, hashes are unique. Barring some exceptional circumstances, the hashes for two different things should <u>never</u> be the same.</li>
-                        <li>Hash functions are one way streets. You can't reverse engineer a hash and figure out the data used to generate it.</li>
+                        <li>Hash functions are one way streets. You can't reverse engineer a hash and figure out the data used to make it.</li>
                         <li>Hashes are extremely reliable in the sense that they are deterministic. This means you can hash the same piece of data over and over again and you'll always get the same result.</li>
                     </ul>
                     <hr class="dashed">
@@ -90,7 +90,7 @@
                     <p class="note">You see hashes all over Bitcoin, from transaction IDs, to address creation, to scripts that define particular spending conditions. Oftentimes, a piece of information will be reduced to its hash to save space.</p>
                     <hr class="dashed">
                     <p>Let's test the deterministic property of hash functions. Make a mental note of the hash in the first picture, the hash of "Cypherpunks write code".</p>
-                    <p>We're going to regenerate this hash ourselves. Type <code>hash('Cypherpunks write code')</code> to see that the hash is the same as the example.</p>
+                    <p>We're going to regenerate this hash ourselves. Type <consoleCommand>hash('Cypherpunks write code')</consoleCommand> to see that the hash is the same as the example.</p>
                 </div>
 
                 <div class="lesson lesson5">
@@ -102,7 +102,7 @@
                     <p class="note">For advanced applications, addresses can correspond to multiple public keys. This is made possible by something called scripts, but that's beyond the scope of this tutorial. </p>
                     <p>We know from the previous lesson that you cannot go backwards with hashes. If someone gives you an address, you cannot reverse engineer the public key used to create it.</p>
                     <hr class="dashed">
-                    <p>Try generating an address for yourself! Type <code>createAddress(publicKey)</code>. This will invoke the <code>createAddress()</code> function with the public key that you created earlier.</p>
+                    <p>Try generating an address for yourself! Type <consoleCommand>createAddress(publicKey)</consoleCommand>. This will invoke the <code>createAddress()</code> function with the public key that you created earlier.</p>
                 </div>
 
                 <div class="lesson lesson6">
@@ -132,7 +132,7 @@
                     <hr class="dashed">
                     <p>The "official" Bitcoin software, the <em>reference implementation</em>, is something called <a href="https://bitcoincore.org/" target="_blank">Bitcoin Core</a>. Bitcoin Core has a bunch of commands you can use to manage your bitcoin.</p>
                     <p>If we play out the example where Alice sends us one bitcoin, we can use the <code>getbalance</code> command to see that the money was received.</p>
-                    <p>Type <code>bitcoin-cli getbalance</code> into the console.</p>
+                    <p>Type <consoleCommand>bitcoin-cli getbalance</consoleCommand> into the console.</p>
                 </div>
 
                 <div class="lesson lesson7">
@@ -161,7 +161,7 @@
                     <hr class="dashed">
                     <p>We'll be using a <code>signTransaction()</code> function for this. It's similar to the <code>signMessage()</code> call made earlier, but the data being signed is different. Instead of accepting any arbitrary message, this accepts a transaction. It then creates the appropriate number of signatures, one per input.</p>
                     <p>The raw transaction we looked at above has been saved to the <code>transaction</code> variable.</p>
-                    <p>Type <code>signTransaction(privateKey, transaction)</code> into the console to sign the transaction.</p>
+                    <p>Type <consoleCommand>signTransaction(privateKey, transaction)</consoleCommand> into the console to sign the transaction.</p>
                 </div>
 
                 <div class="lesson lesson8">
@@ -186,7 +186,7 @@
                     <p>Roughly every ten minutes, a miner will take a bunch of unconfirmed transactions from their copy of the mempool and put, or "mine" them into a block.</p>
                     <br><h3>Fees</h3>
                     <p>The likelihood of your transaction making it into the next block depends on the other transactions in the mempool and the fees you choose to pay.</p>
-                    <p>We didn't explicitly cover fees, learned a little about them when looking at change outputs. Remember the example where Alice had 10 bitcoin and wanted to send you one? She had to specify the remaining 9 should be returned back to her, otherwise they would have been considered fees! Fees go to the miner that creates the block.</p>
+                    <p>We didn't explicitly cover fees, but learned a little about them when looking at change outputs. Remember the example where Alice had 10 bitcoin and wanted to send you one? She had to specify the remaining 9 should be returned back to her, otherwise they would have been considered fees! Fees go to the miner that creates the block.</p>
                     <p>Any amount of bitcoin that is "left over" in a transaction is considered to be the fee.</p>
                     <p>In the previous example if Alice decides to only return 8.5 bitcoin to herself, then 0.5 bitcoin would be the transaction fee. The math checks out: the total transaction input is 10 (Alice's 10 bitcoin), and the total output is 9.5 (1 to you, and 8.5 back to Alice as change).</p>
                     <p class="note">In the early days of Bitcoin, transactions didn't need to pay fees, but as Bitcoin matures, fees are increasingly important.</p>
@@ -194,7 +194,7 @@
                     <p>How would we know this? We could periodically ask a Bitcoin node, or use one of the block explorers mentioned earlier to monitor the blockchain and see when a particular transaction is mined.</p>
                     <hr class="dashed">
                     <p>The last thing to do is check our balance one more time to make sure it's accurate and reflects the 1.5 bitcoin sent to our friend Hal in the previous lesson.</p>
-                    <p>You can do that with the same <code>bitcoin-cli getbalance</code> command from an earlier lesson. We're expecting to see a remaining balance of 0.5 bitcoin.</p>
+                    <p>You can do that with the same <consoleCommand>bitcoin-cli getbalance</consoleCommand> command from an earlier lesson. We're expecting to see a remaining balance of 0.5 bitcoin.</p>
                 </div>
 
                 <!--
@@ -206,7 +206,7 @@
                     <br>
                     <hr class="dashed">
                     <br>
-                    <p>Thank you for checking out this little tutorial. If you wish to do it again, you can use the <code>reset</code> command.</p>
+                    <p>Thank you for checking out this little tutorial. If you wish to do it again, you can use the <consoleCommand>reset</consoleCommand> command.</p>
                     <p>The fun doesn't have to stop here! You're now ready to venture futher down the rabbit hole. Here are some of my favorite resources to continue learning about Bitcoin:</p>
                     <br><h3>General resources</h3>
                     <ul>

@@ -11,6 +11,7 @@
  @errorColor: #d14;
  @codeColor: #222;
  @orangeColor: #ed602b;
+ @darkOrange: #c6491b;
  @lightorangeColor: #f3baa6;
  @retroGreenColor: #B7CF99;
  @retroBlue: #087B75;
@@ -257,11 +258,20 @@
                 font-family: monospace;
                 white-space: pre;
                 border-radius: 3px;
-                background: #eee;
                 padding: 3px;
                 color: @codeColor;
+                font-weight: bold;
             }
-    
+
+            consoleCommand {
+                font-family: monospace;
+                white-space: pre;
+                border-radius: 3px;
+                background: #fbfaf3;
+                padding: 3px;
+                color: @orangeColor;
+            }
+
             em {
                 font-style: italic;
             }
