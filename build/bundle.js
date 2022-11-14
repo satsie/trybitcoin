@@ -12,19 +12,16 @@ exports.keyMap = keyMap;
 },{}],2:[function(require,module,exports){
 (function (Buffer){(function (){
 const stringUtils = require('./stringUtils');
-
 const schnorr = require('bip-schnorr');
-
 const forge = require('node-forge');
+const bitcoinjs = require('bitcoinjs-lib');
 
-const bitcoinjs = require('bitcoinjs-lib'); // This is an extremely simplified example of what a transaction looks like.
+// This is an extremely simplified example of what a transaction looks like.
 // so many fields have been removed, and some have even been changed to accomodate
 // a beginner audience (i.e. vin => inputs). This is NOT canonical!!!!
 // Script sigs (should have saved the hex values but it doesn't matter):
 // "asm": "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef",
 // "asm": "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3",
-
-
 let mockTxToSign = {
   "inputs": [{
     "address": "14wiw5uGiZtFNqmwEfDZJM8k2qzxxd9fS5",
@@ -40,21 +37,22 @@ let mockTxToSign = {
     "value": 0.50000000,
     "address": "14wiw5uGiZtFNqmwEfDZJM8k2qzxxd9fS5"
   }]
-}; // More mock data. This is not the actual transaction hashe or the hex data
+};
 
+// More mock data. This is not the actual transaction hashe or the hex data
 let mockTxId = '7a37db6dae291ce730ab8de40650844d627a20a096f323836636236e200a55b5';
 let rawSignedTx = '0200000001797a827a25bdf354b9f9440d7de2ded6596cc2c8b8dc2eaf936a476049f898c4000000006a473044022034c2cde7e751cb6d72bceb73cbad5614f43d60a59142f6eef20a40786f683772022070b9a8c6d71d9ea628fa943e51ccf5d35bafd71e364f00e1dfbacb5b8b873c5901210227d85ba011276cf25b51df6a188b75e604b38770a462b2d0e9fb2fc839ef5d3ffdffffff03c41b1a1e010000001976a914a96c7dbd1264f69bb52549618f3c59c9440f3c6f88ac80d1f008000000001976a91460baa0f494b38ce3c940dea67f3804dc52d1fb9488ac80f0fa02000000001976a914ba27f99e007c7f605a8305e318c1abde3cd220ac88ac00000000';
-
 function createAddress() {
   // want to make a taproot address, but that requires the tiny-secp256k1 lib which
   // uses WASM. Couldn't find a way to add WASM support with Gulp. It appears do-able
   // with Webpack, but that's going to require some effot.
   // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1746#issuecomment-968371375
   // https://github.com/bitcoinjs/tiny-secp256k1/blob/master/examples/react-app/webpack.config.js
+
   // For now, create the address with a (new) EC keypair. Keypair is hardcoded because in order
   // to randomize it we'd need the same tiny-secp256k1 lib mentioned above
-  const ecPublicKey = '03c94e02d923a42bf6011f55ec52580c1ca4bbee5d7aeccf7aa8adc62d93478130'; // just in case this is needed later
-
+  const ecPublicKey = '03c94e02d923a42bf6011f55ec52580c1ca4bbee5d7aeccf7aa8adc62d93478130';
+  // just in case this is needed later
   const ecPrivateKey = 'd827067318c514f1ff19db230f285fb5f49995a850bbb7a24545eac57957fbb6';
   const {
     address
@@ -64,10 +62,10 @@ function createAddress() {
   return {
     address
   };
-} // Mock bitcoin-cli commands. At the moment there are no plans to do anything more involved
+}
+
+// Mock bitcoin-cli commands. At the moment there are no plans to do anything more involved
 // than this (like running a regtest Docker container)
-
-
 function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
   const expectedInput = {
     6: 'bitcoin-cli getbalance',
@@ -78,15 +76,15 @@ function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
     6: "1.00000000",
     8: mockTxId,
     9: "0.50000000"
-  }; // case sensitive by design
+  };
 
+  // case sensitive by design
   if (expectedInput[lessonNumber] === userInputCommand) {
     return {
       success: true,
       result: lessonAnswers[lessonNumber]
     };
   }
-
   return {
     success: false,
     result: {
@@ -94,24 +92,24 @@ function evaluateBitcoinRPC(userInputCommand, lessonNumber) {
     }
   };
 }
-
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
   const publicKeyBuffer = Buffer.from(aPublicKeyHex, 'hex');
   const signatureBuffer = Buffer.from(aSignature, 'hex');
-  const messageBuffer = stringUtils.convertToFixedBuffer(aMessage, 32); // the bip-schnorr lib will throw an error if this is not valid
+  const messageBuffer = stringUtils.convertToFixedBuffer(aMessage, 32);
 
+  // the bip-schnorr lib will throw an error if this is not valid
   schnorr.verify(publicKeyBuffer, messageBuffer, signatureBuffer);
   return {
     valid: true
   };
 }
-
 function hash(inputString) {
   // from https://remarkablemark.org/blog/2021/08/29/javascript-generate-sha-256-hexadecimal-hash/
-  const utf8 = new TextEncoder().encode(inputString); // Using forge because window.crypto.subtle (subtle crypto) is restricted to secure origins,
+  const utf8 = new TextEncoder().encode(inputString);
+
+  // Using forge because window.crypto.subtle (subtle crypto) is restricted to secure origins,
   // aka https or localhost. Planning to move to https but that is going to require some updates
   // to the CD pipeline.
-
   let md = forge.md.sha256.create();
   md.update(Buffer.from(utf8, 'utf-8'));
   const hashHex = md.digest().toHex();
@@ -119,7 +117,6 @@ function hash(inputString) {
     hash: hashHex
   };
 }
-
 module.exports = {
   createAddress,
   evaluateBitcoinRPC,
@@ -133,80 +130,72 @@ module.exports = {
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"./stringUtils":4,"bip-schnorr":19,"bitcoinjs-lib":59,"buffer":83,"node-forge":125}],3:[function(require,module,exports){
 var $ = require('jquery');
-
 const Buffer = require('safe-buffer').Buffer;
-
 const schnorr = require('bip-schnorr');
-
 const stringUtils = require('./stringUtils');
-
 const constants = require('./constants');
-
 const lessonLogic = require('./lessonLogic');
-
 const validation = require('./validation');
-
 let mostRecentCommand;
 let privateKey;
 let publicKey;
 let message;
-let signature; // For lesson 7
+let signature;
+// For lesson 7
+let transaction = lessonLogic.mockTxToSign;
 
-let transaction = lessonLogic.mockTxToSign; // store the lesson number in local storage so the user can leave and come back
-
+// store the lesson number in local storage so the user can leave and come back
 let currentLesson = parseInt(localStorage.getItem('currentLesson'), 10) || 0;
 let localDataString = localStorage.getItem('localData') || '';
 let localData = {};
-
 try {
   localData = JSON.parse(localDataString);
 } catch (e) {
   console.log('Error parsing localData. Setting to empty object.');
-} // Populate any existing values from the local storage
+}
 
-
+// Populate any existing values from the local storage
 if (Object.keys(localData).length > 0) {
   if (localData.mostRecentCommand) {
     mostRecentCommand = localData.mostRecentCommand;
   }
-
   if (localData.privateKey) {
     privateKey = localData.privateKey;
   }
-
   if (localData.publicKey) {
     publicKey = localData.publicKey;
   }
-
   if (localData.message) {
     message = localData.message;
   }
-
   if (localData.signature) {
     signature = localData.signature;
   }
-} // Hide the previous lesson page and show the next one
+}
 
-
+// Hide the previous lesson page and show the next one
 function startLesson(newLessonNumber) {
   // hide the current lesson
-  $('.lesson' + currentLesson).hide(); // Show the new lesson
+  $('.lesson' + currentLesson).hide();
 
-  $('.lesson' + newLessonNumber).show(); // auto scroll to the top of the next lesson
+  // Show the new lesson
+  $('.lesson' + newLessonNumber).show();
 
-  $('.lessons').scrollTop(0); // persist the new lesson number
+  // auto scroll to the top of the next lesson
+  $('.lessons').scrollTop(0);
 
+  // persist the new lesson number
   currentLesson = newLessonNumber;
   localStorage.setItem('currentLesson', currentLesson);
-  let finalLesson = false; // If there is no lesson to show, display the final page
-
+  let finalLesson = false;
+  // If there is no lesson to show, display the final page
   if (!$('.lesson' + currentLesson).length) {
     $('.final').show();
     finalLesson = true;
-  } // Progress indicator and next button
+  }
+
+  // Progress indicator and next button
   // Do not show it for lesson 0 (welcome page), or the final page
-
-
   if (newLessonNumber === 0 || finalLesson === true) {
     $("#lessonNumber").html('');
     $("#nextButton").prop("hidden", true);
@@ -215,28 +204,28 @@ function startLesson(newLessonNumber) {
     $("#nextButton").prop("hidden", false);
     $("#nextButton").prop("disabled", true);
   }
-} // Increment the current lesson counter, save to local storage, and call
+}
+
+// Increment the current lesson counter, save to local storage, and call
 // startLesson() to refresh the lesson page
-
-
 function advanceLesson() {
   startLesson(currentLesson + 1);
 }
-
 function saveToLocalStorage(key, value) {
   localData[key] = value;
   localStorage.setItem('localData', JSON.stringify(localData));
 }
-
 function generateKeys() {
   // literally just the example from https://github.com/guggero/bip-schnorr
   // TODO actually generate some that are different every time
   const privateKeyHex = 'B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF';
-  const publicKeyHex = 'DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659'; // Save the keys for use in subsequent lessons
+  const publicKeyHex = 'DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659';
 
+  // Save the keys for use in subsequent lessons
   privateKey = privateKeyHex;
-  publicKey = publicKeyHex; // Also persist to local storage
+  publicKey = publicKeyHex;
 
+  // Also persist to local storage
   saveToLocalStorage('privateKey', privateKey);
   saveToLocalStorage('publicKey', publicKey);
   return {
@@ -244,20 +233,21 @@ function generateKeys() {
     privateKey: privateKeyHex
   };
 }
-
 function signMessage(privateKeyHex, messageString) {
   if (messageString === undefined) {
     throw Error('message parameter is undefined');
-  } // save the message to local storage
+  }
 
-
+  // save the message to local storage
   saveToLocalStorage('message', messageString);
-  message = messageString; // bip-schnorr lib requires the message to be 32 bytes
+  message = messageString;
 
+  // bip-schnorr lib requires the message to be 32 bytes
   const messageBuffer = stringUtils.convertToFixedBuffer(message, 32);
   const schnorrSig = schnorr.sign(privateKeyHex, messageBuffer);
-  const schnorrSigHex = schnorrSig.toString('hex'); // save the signature to local store
+  const schnorrSigHex = schnorrSig.toString('hex');
 
+  // save the signature to local store
   saveToLocalStorage('signature', schnorrSigHex);
   signature = schnorrSigHex;
   return {
@@ -265,25 +255,23 @@ function signMessage(privateKeyHex, messageString) {
     signature: schnorrSigHex
   };
 }
-
 function verifySignature(aPublicKeyHex, aMessage, aSignature) {
   return lessonLogic.verifySignature(aPublicKeyHex, aMessage, aSignature);
 }
-
 function hash(inputString) {
   return lessonLogic.hash(inputString);
-} // The fact that this accepts an address is misleading. Since we can't use 32 byte Schnorr
+}
+
+// The fact that this accepts an address is misleading. Since we can't use 32 byte Schnorr
 // friendly keys (see helper method), we just throw away whatever the user provides. The parameter
 // is here to make the user feel like they are passing in a pub key, since one is required
 // for address creation.
-
-
 function createAddress(aPublicKey) {
   // TODO can return an error if the user does not provide a public key
   return lessonLogic.createAddress();
-} // This is not actually signing a transaction, but it would be cool to implement in a future version
+}
 
-
+// This is not actually signing a transaction, but it would be cool to implement in a future version
 function signTransaction(privateKeyHex, transactionToSign) {
   transactionToSign.inputs[0].scriptSig = "002093f5ff817f1953be6cc714676b5f9169f1322fa2647053acce88358444ca2fef";
   transactionToSign.inputs[1].scriptSig = "0020fd02d8db5e4ef12b09d5f8f035a4758fa87fe528ed2527d5fe3f5680592ba2e3";
@@ -291,23 +279,22 @@ function signTransaction(privateKeyHex, transactionToSign) {
     transaction: transactionToSign
   };
 }
-
 async function evaluateCode(userInput, lessonNumber) {
   let returnObject = {
     success: true,
     result: ''
-  }; // If this is not a JavaScript lesson, this is a bitcoin-cli lesson
+  };
 
+  // If this is not a JavaScript lesson, this is a bitcoin-cli lesson
   if (validation.bitcoinRpcLessons.includes(lessonNumber)) {
     return lessonLogic.evaluateBitcoinRPC(userInput, lessonNumber);
-  } // Some protections for blindly feeding user input into eval()
+  }
 
-
+  // Some protections for blindly feeding user input into eval()
   if (userInput.indexOf('var') !== -1 || userInput.indexOf('function') !== -1 || userInput.indexOf('eval') !== -1) {
     returnObject.result = 'undefined;' + userInput;
     return returnObject;
   }
-
   try {
     const evalResult = await eval(userInput);
     returnObject.result = evalResult;
@@ -317,31 +304,31 @@ async function evaluateCode(userInput, lessonNumber) {
       error: `Error while trying to execute '${userInput}'. Message: ${e.message}`
     };
   }
-
   return returnObject;
 }
-
 function printResult($userInput, $consolePrompt, isError, aResult) {
   let result = aResult;
-  const userInputString = $('.console-input').val(); // take the user input and dispaly as a label
+  const userInputString = $('.console-input').val();
 
-  $('.prompt-completed').clone().removeClass('prompt-completed').insertBefore($consolePrompt).find('code').text(userInputString); // clear the user input
+  // take the user input and dispaly as a label
+  $('.prompt-completed').clone().removeClass('prompt-completed').insertBefore($consolePrompt).find('code').text(userInputString);
 
+  // clear the user input
   $userInput.val('');
-
   if (isError === true) {
     result = '<strong class = "error">' + result + '</strong>';
-  } // print the result
+  }
 
-
+  // print the result
   $('.prompt-result').clone().removeClass('prompt-result').insertBefore($consolePrompt).find('code')[isError ? 'html' : 'text'](result);
-} // This is the same opening line as 'document ready()'
+}
 
-
+// This is the same opening line as 'document ready()'
 $(function () {
   // all custom jQuery will go here
   //  .html:              <p id="demo"></p>
   //  .js:                $("#demo").html("Hello, World!");
+
   // Fill in the JSON for lesson 7
   $("#lesson7UnsignedTx").html(JSON.stringify(lessonLogic.mockTxToSign, null, 2));
   $("#lesson8BroadcastTx").val(`bitcoin-cli sendrawtransaction ${lessonLogic.rawSignedTx}`);
@@ -349,113 +336,124 @@ $(function () {
   const $consolePrompt = $('.console-prompt');
   const $userInput = $('.console-input');
   const $nextButton = $('#nextButton');
-  const $lessonArea = $('.lessons'); // Focus on the user input box
+  const $lessonArea = $('.lessons');
 
-  $userInput.trigger('focus'); // auto scroll to the bottom when the console starts to fill
+  // Focus on the user input box
+  $userInput.trigger('focus');
 
+  // auto scroll to the bottom when the console starts to fill
   const consoleHeight = $console[0].scrollHeight;
-  $console.scrollTop(consoleHeight); // auto scroll lesson to the top
+  $console.scrollTop(consoleHeight);
 
+  // auto scroll lesson to the top
   $lessonArea.scrollTop(0);
-
   if (currentLesson !== 1) {
     // hide lesson 1, which is turned on by default
     $('.lesson1').hide();
     startLesson(currentLesson);
-  } // When the next button is pressed, advance the lesson and disable the button
+  }
 
-
+  // When the next button is pressed, advance the lesson and disable the button
   $nextButton.on('click', function () {
     advanceLesson();
     $nextButton.prop("disabled", true);
-  }); // If the user clicks anywhere in the console box, focus the cursor on the input line
+  });
 
+  // If the user clicks anywhere in the console box, focus the cursor on the input line
   $console.on('click', function (e) {
     $userInput.trigger('focus');
   });
   $userInput.on('keydown', async function (e) {
-    const userInputString = $('.console-input').val(); // Normalize the user input by making it all lowercase and trimming leading and trailing whitespace
+    const userInputString = $('.console-input').val();
 
+    // Normalize the user input by making it all lowercase and trimming leading and trailing whitespace
     const lowercaseUserInputString = userInputString.toLowerCase().trim();
-
     if (e.key === constants.keyMap.ENTER) {
       // save the most recent command
       mostRecentCommand = userInputString;
-      saveToLocalStorage('mostRecentCommand', userInputString); // do nothing if there is no user input
+      saveToLocalStorage('mostRecentCommand', userInputString);
 
+      // do nothing if there is no user input
       if (userInputString.length === 0) {
         return;
       }
-
       if (lowercaseUserInputString.includes('reset')) {
         // hide the current lesson by resetting the CSS
-        window.location.reload(); // reset to lesson 0
+        window.location.reload();
 
+        // reset to lesson 0
         currentLesson = 0;
         localStorage.setItem('currentLesson', currentLesson);
-        startLesson(currentLesson); // clear the user input
+        startLesson(currentLesson);
 
-        $userInput.val(''); // clear the rest of the data stored locally
+        // clear the user input
+        $userInput.val('');
 
-        localStorage.setItem('localData', {}); // Reset the mock transaction for lesson 7. Can move this into a
+        // clear the rest of the data stored locally
+        localStorage.setItem('localData', {});
+
+        // Reset the mock transaction for lesson 7. Can move this into a
         // generalized reset method in case other lesson data needs to be
         // cleaned up
-
         transaction.inputs[0].scriptSig = "";
         transaction.inputs[1].scriptSig = "";
         return;
-      } // skip to a certain lesson. mainly for development use. The lessons build on each other
+      }
+
+      // skip to a certain lesson. mainly for development use. The lessons build on each other
       // and store variables from previous lessons. Skipping ahead will cause issues.
-
-
       if (lowercaseUserInputString.startsWith('startlesson(')) {
         const lessonNumberArray = lowercaseUserInputString.match(/\(([^()]*)\)/);
         const newLessonNumber = parseInt(lessonNumberArray[1], 10);
-        startLesson(newLessonNumber); // clear the user input
+        startLesson(newLessonNumber);
 
+        // clear the user input
         $userInput.val('');
         return;
       }
-
-      if (lowercaseUserInputString.includes('showanswer()')) {// TODO show the answer
+      if (lowercaseUserInputString.includes('showanswer()')) {
+        // TODO show the answer
       }
-
       let result = '';
       let error = true;
       const sanityCheckResult = validation.userInputSanityCheck(currentLesson, lowercaseUserInputString);
-      result = sanityCheckResult; // Special case for lesson 0
+      result = sanityCheckResult;
 
+      // Special case for lesson 0
       if (sanityCheckResult === true && currentLesson === 0) {
         error = false;
-        result = ''; // move onto the next lesson automatically
+        result = '';
 
+        // move onto the next lesson automatically
         advanceLesson();
       } else if (sanityCheckResult === true) {
-        const evalResult = await evaluateCode(userInputString, currentLesson); // The user input ran successfully, but did it evaluate to the correct answer?
+        const evalResult = await evaluateCode(userInputString, currentLesson);
 
+        // The user input ran successfully, but did it evaluate to the correct answer?
         const checkedResult = validation.checkResult(currentLesson, evalResult);
-        result = JSON.stringify(checkedResult.result, undefined, 2); // If the user had the right answer,
+        result = JSON.stringify(checkedResult.result, undefined, 2);
 
+        // If the user had the right answer,
         if (checkedResult.success === true) {
-          error = false; // Turn on the next button and only advance the lesson if the user presses it
+          error = false;
 
+          // Turn on the next button and only advance the lesson if the user presses it
           $nextButton.prop("disabled", false);
         }
       }
+      printResult($userInput, $consolePrompt, error, result);
 
-      printResult($userInput, $consolePrompt, error, result); // Auto scroll to the bottom of the console
-
+      // Auto scroll to the bottom of the console
       const newConsoleHeight = $console[0].scrollHeight;
       $console.scrollTop(newConsoleHeight);
-    } // enter the most recent command if the user presses the up arrow
+    }
 
-
+    // enter the most recent command if the user presses the up arrow
     if (e.key === constants.keyMap.UP) {
       if (mostRecentCommand) {
         $userInput.val(mostRecentCommand);
       }
     }
-
     ;
   });
 });
@@ -465,27 +463,23 @@ $(function () {
 function hexEncode(aString) {
   var hex, i;
   var result = "";
-
   for (i = 0; i < aString.length; i++) {
     hex = aString.charCodeAt(i).toString(16);
     result += ("000" + hex).slice(-4);
   }
-
   return result;
 }
-
 function convertToHexBuffer(aString) {
   const hexString = hexEncode(aString);
   const buffer = Buffer.from(hexString, 'hex');
   return buffer;
-} // Converts to a hex buffer of length 32
+}
 
-
+// Converts to a hex buffer of length 32
 function convertToFixedBuffer(aString, size) {
   const buffer = convertToHexBuffer(aString);
   return Buffer.concat([buffer], size);
 }
-
 module.exports = {
   convertToFixedBuffer
 };
@@ -496,26 +490,22 @@ module.exports = {
 const javaScriptLessons = [1, 2, 3, 4, 5, 7];
 const bitcoinRpcLessons = [6, 8, 9];
 const totalNumberLessons = 10;
-
 function checkResult(lessonNumber, resultToCheck) {
   let checkedResult = resultToCheck;
-
   if (lessonNumber === 4) {
     const cypherpunksWriteCodeHash = '42cc22190b177e5c48e32fe87c214d88eb21cac7780aad65b8b816d77cf22820';
-
     if (resultToCheck.result.hash !== cypherpunksWriteCodeHash) {
       checkedResult.success = false;
       checkedResult.result.error = 'The hash does not match! Try running: hash(\'Cypherpunks write code\')';
     }
   }
-
   return checkedResult;
-} // sanity check the user command before sending it off to eval()
+}
+
+// sanity check the user command before sending it off to eval()
 // provides minor protection against blindly running eval() on user input, but the security
 // still needs to be revisited
 // returns true if the sanity check passes
-
-
 function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
   const errorResponse = {
     lesson0: 'Please type \'start\'',
@@ -528,8 +518,9 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson7: 'Please type \'signTransaction(privateKey, transaction)\'',
     lesson8: 'Please copy and paste all of the \'bitcoin-cli sendrawtransaction\' command, including the giant string of letters and numbers. That is the transaction in hex format, and it is required.',
     lesson9: 'Please type \'bitcoin-cli getbalance\''
-  }; // lowercase because the input is normalized before it gets to this method
+  };
 
+  // lowercase because the input is normalized before it gets to this method
   const expectedCommandBeginning = {
     lesson0: 'start',
     lesson1: 'generatekeys(',
@@ -541,33 +532,31 @@ function userInputSanityCheck(aCurrentLesson, aLowercaseInputString) {
     lesson7: 'signtransaction(',
     lesson8: 'bitcoin-cli sendrawtransaction',
     lesson9: 'bitcoin-cli getbalance'
-  }; // It's ok if the user wants to put a semicolon at the end, but remove it to
-  // make validation simpler
+  };
 
+  // It's ok if the user wants to put a semicolon at the end, but remove it to
+  // make validation simpler
   if (aLowercaseInputString.endsWith(';')) {
     aLowercaseInputString = aLowercaseInputString.slice(0, -1);
-  } // If this is a javascript lesson, check that the user input ends with a closing parenthesis
+  }
 
-
+  // If this is a javascript lesson, check that the user input ends with a closing parenthesis
   if (javaScriptLessons.includes(aCurrentLesson) && !aLowercaseInputString.endsWith(')')) {
     return errorResponse[`lesson${aCurrentLesson}`];
-  } // check the beginning of the user input. For javascript commands this makes sure
+  }
+
+  // check the beginning of the user input. For javascript commands this makes sure
   // that there is an opening parenthesis. Without parenthesis, the user could invoke
   // `eval(myFunction)` instead of `eval(myFunction())`. The former would just return
   // the function definition instead of the evaulation
-
-
   if (aLowercaseInputString.startsWith(expectedCommandBeginning[`lesson${aCurrentLesson}`])) {
     return true;
   }
-
   if (errorResponse[`lesson${aCurrentLesson}`]) {
     return errorResponse[`lesson${aCurrentLesson}`];
   }
-
   return false;
 }
-
 module.exports = {
   bitcoinRpcLessons,
   checkResult,
