@@ -4,360 +4,351 @@
  * Copyright (c) 2014 Callum Macrae
  */
 
-@bgAccent: #f5f2e3;
-@textColor: #222;
-@promptColor: #ed602b;
-@responseColor: @promptColor;
-@errorColor: #d14;
-@codeColor: #222;
-@orangeColor: #ed602b;
-@darkOrange: #c6491b;
-@lightorangeColor: #f3baa6;
-@retroGreenColor: #b7cf99;
-@retroBlue: #087b75;
-@retroRed: #c6460f;
+ @bgAccent: #f5f2e3;
+ @textColor: #222;
+ @promptColor: #ed602b;
+ @responseColor: @promptColor;
+ @errorColor: #d14;
+ @codeColor: #222;
+ @orangeColor: #ed602b;
+ @darkOrange: #c6491b;
+ @lightorangeColor: #f3baa6;
+ @retroGreenColor: #B7CF99;
+ @retroBlue: #087B75;
+ @retroRed: #C6460F;
 
-// http://www.paulirish.com/2012/box-sizing-border-box-ftw/
-html {
-  box-sizing: border-box;
-}
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
+ 
+ // http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+ html {
+     box-sizing: border-box;
+ }
+ *, *:before, *:after {
+     box-sizing: inherit;
+ }
+ 
+ html, body {
+     padding: 0;
+     margin: 0;
+     height: 100%;
+ }
+ 
+ body {
+     display: flex;
+     flex-direction: column;
+ 
+     font-family: "Open Sans", sans-serif;
+     color: @textColor;
 
-html,
-body {
-  padding: 0;
-  margin: 0;
-  height: 100%;
-}
+     background-image: ~"url('../assets/proofofword-background-light.png')";
+     background-size: 30%, 30%;
+     background-attachment: fixed;
+     background-position: 25% 75%;
+ }
+ 
+ header {
+     margin-bottom: 40px;
+     height: 120px;
+     min-height: 80px;
 
-body {
-  display: flex;
-  flex-direction: column;
-
-  font-family: "Open Sans", sans-serif;
-  color: @textColor;
-
-  background-image: ~"url('../assets/proofofword-background-light.png')";
-  background-size: 30%, 30%;
-  background-attachment: fixed;
-  background-position: 25% 75%;
-}
-
-header {
-  margin-bottom: 40px;
-  height: 120px;
-  min-height: 80px;
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  background-color: @bgAccent;
-  text-align: center;
-
-  h1 {
-    text-transform: uppercase;
-    font-size: 48pt;
-    font-weight: bold;
-    color: @orangeColor;
-  }
-
-  a {
-    position: absolute;
-    color: @orangeColor;
-    top: 1rem;
-    left: 5rem;
-  }
-}
-
-.main {
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  width: calc(~"100% - 60px");
-  min-height: 350px;
-  margin: 0 auto;
-  gap: 20px;
-
-  & > div {
-    flex: 1;
-  }
-
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: @bgAccent;
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: @lightorangeColor;
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  pre {
-    font-size: 13px;
-    font-family: monospace;
-  }
-
-  textarea {
-    border-style: dashed;
-    border-color: @orangeColor;
-    outline: none;
-    padding: 10px;
-    width: 100%;
-    word-wrap: break-word;
-  }
-
-  @media all and (max-width: 640px) {
-    flex-direction: column;
-
-    .console {
-      padding: 0 50px 0 20px;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+ 
+     background-color: @bgAccent;
+     text-align: center;
+ 
+     h1 {
+         text-transform: uppercase;
+         font-size: 48pt;
+         font-weight: bold;
+         color: @orangeColor;
+     }
+ }
+ 
+ .main {
+     display: flex;
+     flex: 1;
+     flex-direction: row;
+     width: calc(~"100% - 60px");
+     min-height: 350px;
+     margin: 0 auto;
+     gap: 20px;
+ 
+     & > div {
+         flex: 1;
+     }
+ 
+    ::-webkit-scrollbar {
+        width: 5px;
     }
 
-    .tutorial {
-      flex: 3;
-      margin-bottom: 20px;
-      order: -1;
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: @bgAccent;
     }
-  }
-
-  .console {
-    padding-right: 20px;
-    font-family: monospace;
-    overflow: auto;
-    background-color: #fbfaf3;
-    border-style: dashed;
-    border-color: @orangeColor;
-    border-width: thin;
-    overflow-y: scroll;
-    flex: 3;
-
-    .console-header {
-      color: @orangeColor;
+  
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: @lightorangeColor;
     }
-    .console-text {
-      padding-left: 10px;
-      padding-top: 10px;
+  
+    /* Handle on hover */
+     ::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
 
-    .info {
-      //			font-family: "Open Sans", sans-serif;
-      color: @textColor;
-      margin-bottom: 10px;
-    }
-
-    code {
-      white-space: pre-wrap;
-      word-break: break-all;
-      color: @responseColor;
-    }
-
-    .prompt + code {
-      color: @codeColor;
-      font-size: 13px;
-    }
-
-    .prompt {
-      color: @promptColor;
-      font-size: 13px;
-    }
-
-    input {
-      font-size: 13px;
-      font-family: monospace;
-      border: 0;
-      outline: none;
-      background: transparent;
-
-      width: calc(~"100% - 30px");
-
-      // margin-top: -2px;
-      margin-left: -1px;
-    }
-
-    li:nth-child(even) {
-      margin: 5px 16px;
-    }
-
-    li:nth-child(odd) {
-      margin: 5px 0px;
-    }
-
-    .error {
-      color: @errorColor;
-      font-size: 13px;
-    }
-  }
-
-  .instructions {
-    display: flex;
-    flex-direction: column;
-    flex: 4;
-
-    strong {
-      font-weight: bold;
-    }
-
-    p.note {
-      background-color: @bgAccent;
-      border-left: solid 4px @retroGreenColor;
-      line-height: 18px;
-      overflow: hidden;
-      padding: 12px;
-      font-style: italic;
-    }
-
-    /* Dashed border */
-    hr.dashed {
-      border-style: none none dashed;
-      color: @orangeColor;
-    }
-
-    .lessons {
-      padding: 0 50px 0 50px;
-      overflow: auto;
-
-      h1 {
-        font-size: 18pt;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: @retroBlue;
-      }
-
-      h2 {
-        font-size: 18pt;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: @orangeColor;
-      }
-
-      h3 {
-        font-size: 14pt;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: @orangeColor;
-      }
-
-      p,
-      pre {
-        line-height: 1.4;
-        margin-bottom: 10px;
-      }
-
-      li {
-        line-height: 1.4;
-        margin-bottom: 5px;
-        list-style: circle;
-        margin-left: 20px;
-      }
-
-      code {
+     pre {
+        font-size: 13px;
         font-family: monospace;
-        white-space: pre;
-        border-radius: 3px;
-        padding: 3px;
-        color: @codeColor;
-        font-weight: bold;
-      }
+     }
 
-      consoleCommand {
-        font-family: monospace;
-        white-space: pre;
-        border-radius: 3px;
-        background: #fbfaf3;
-        padding: 3px;
-        color: @orangeColor;
-      }
+     textarea {
+        border-style: dashed;
+        border-color: @orangeColor;
+        outline: none;
+        padding: 10px;
+        width: 100%;
+        word-wrap: break-word;
+     }
 
-      em {
-        font-style: italic;
-      }
+     @media all and (max-width: 640px) {
+         flex-direction: column;
+ 
+         .console {
+             padding: 0 50px 0 20px;
+         }
+ 
+         .tutorial {
+             flex: 3;
+             margin-bottom: 20px;
+             order: -1;
+         }
+     }
 
-      .lesson {
-        background-color: white;
-      }
+     .console {
+         padding-right: 20px;
+         font-family: monospace;
+         overflow: auto;
+         background-color: #fbfaf3;
+         border-style: dashed;
+         border-color: @orangeColor;
+         border-width: thin;
+         overflow-y: scroll;
+         flex: 3;
+ 
+        .console-header {
+            color: @orangeColor;
+        }
+        .console-text {
+          padding-left: 10px;
+          padding-top: 10px;
+        }
 
-      .lesson-image {
-        max-width: 100%;
-        height: auto;
-      }
+         .info {
+ //			font-family: "Open Sans", sans-serif;
+             color: @textColor;
+             margin-bottom: 10px;
+         }
+ 
+         code {
+             white-space: pre-wrap;
+             word-break: break-all;
+             color: @responseColor;
+         }
+ 
+         .prompt + code {
+             color: @codeColor;
+             font-size: 13px;
+         }
+ 
+         .prompt {
+             color: @promptColor;
+             font-size: 13px;
+         }
+ 
+         input {
+             font-size: 13px;
+             font-family: monospace;
+             border: 0;
+             outline: none;
+             background: transparent;
+ 
+             width: calc(~"100% - 30px");
+ 
+             // margin-top: -2px;
+             margin-left: -1px;
+         }
+ 
+         li:nth-child(even) {
+             margin: 5px 16px;
+         }
 
-      .lesson:not(.lesson1) {
-        display: none;
-      }
+         li:nth-child(odd) {
+            margin: 5px 0px;
+        }
+
+         .error {
+             color: @errorColor;
+             font-size: 13px;
+         }
+     }
+ 
+     .instructions {
+        display: flex;
+        flex-direction: column;
+        flex: 4;
+
+        strong {
+            font-weight: bold;
+        }
+
+        p.note {
+            background-color: @bgAccent;
+            border-left: solid 4px @retroGreenColor;
+            line-height: 18px;
+            overflow: hidden;
+            padding: 12px;
+            font-style: italic;
+        }
+
+       /* Dashed border */
+        hr.dashed {
+            border-style: none none dashed;
+            color: @orangeColor;
+        }
+
+        .lessons {
+            padding: 0 50px 0 50px;
+            overflow: auto;
+
+            h1 {
+                font-size: 18pt;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: @retroBlue;
+            }
+
+            h2 {
+                font-size: 18pt;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: @orangeColor;
+            }
+
+            h3 {
+                font-size: 14pt;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: @orangeColor;
+            }
+
+            p, pre {
+                line-height: 1.4;
+                margin-bottom: 10px;
+            }
+    
+            li {
+                line-height: 1.4;
+                margin-bottom: 5px;
+                list-style: circle;
+                margin-left: 20px;
+            }
+
+            code {
+                font-family: monospace;
+                white-space: pre;
+                border-radius: 3px;
+                padding: 3px;
+                color: @codeColor;
+                font-weight: bold;
+            }
+
+            consoleCommand {
+                font-family: monospace;
+                white-space: pre;
+                border-radius: 3px;
+                background: #fbfaf3;
+                padding: 3px;
+                color: @orangeColor;
+            }
+
+            em {
+                font-style: italic;
+            }
+
+            .lesson {
+                background-color: white;
+            }
+
+            .lesson-image {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .lesson:not(.lesson1) {
+                display: none;
+            }
+        }
+
+        .lessonFooter {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+            width: calc(~"100% - 60px");
+            min-height: 50px;
+            margin: 0 auto;
+        
+            & > div {
+                flex: 1;
+            }
+        
+            .navigationButtonArea {
+                padding: 20px 10px 0 10px;
+                font-size: 12px;
+            }
+
+            button:enabled {
+                background-color: @orangeColor;
+                color: white;
+                font-family: 'Courier New', Courier, monospace;
+                border: none
+            }
+
+            button:hover:enabled {
+                transform: translate(2px, 2px);
+                box-shadow: 2px 2px @retroGreenColor;
+            }
+
+            .progressIndicator {
+                padding: 20px 0 0 0;
+                color: @orangeColor;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 12px;
+             }
+        }
+
     }
 
-    .lessonFooter {
-      display: flex;
-      flex: 1;
-      flex-direction: row;
-      width: calc(~"100% - 60px");
-      min-height: 50px;
-      margin: 0 auto;
-
-      & > div {
-        flex: 1;
-      }
-
-      .navigationButtonArea {
-        padding: 20px 10px 0 10px;
-        font-size: 12px;
-      }
-
-      button:enabled {
-        background-color: @orangeColor;
-        color: white;
-        font-family: "Courier New", Courier, monospace;
-        border: none;
-      }
-
-      button:hover:enabled {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px @retroGreenColor;
-      }
-
-      .progressIndicator {
-        padding: 20px 0 0 0;
-        color: @orangeColor;
-        font-family: "Courier New", Courier, monospace;
-        font-size: 12px;
-      }
-    }
-  }
-}
-
-footer {
-  margin-top: 30px;
-  height: 90px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  background-color: @bgAccent;
-  text-align: center;
-}
-
-@media all and (max-width: 500px) {
-  .gh-ribbon {
-    display: none;
-  }
-}
-
-.hidden-storage {
-  display: none;
-}
+ }
+ 
+ footer {
+    margin-top: 30px;
+    height: 90px;
+ 
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+ 
+     background-color: @bgAccent;
+     text-align: center;
+ }
+ 
+ @media all and (max-width: 500px) {
+     .gh-ribbon {
+         display: none;
+     }
+ }
+ 
+ .hidden-storage {
+     display: none;
+ }
