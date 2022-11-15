@@ -171,7 +171,7 @@
                     <h1>Lesson 8 - Broadcasting a Transaction</h1>
                     <p>See those values in the <code>scriptSig</code> fields? That means the transaction has been signed!</p>
                     <p>Now we can go ahead and <nobr>📣 <strong>broadcast</strong> 📣</nobr> it. This means giving the transaction to a Bitcoin node. The node will then propogate it to the rest of the nodes in the network.</p>
-                    <p>Each Bitcoin node has a set of peers it reguarly "talks" to. When a node hears about a new transaction, it shares it with its peers.</p>
+                    <p>Each Bitcoin node has a set of peers it regularly "talks" to. When a node hears about a new transaction, it shares it with its peers.</p>
                     <p class="note">It only takes <a href="https://bitcoin.stackexchange.com/questions/76789/is-bitcoins-gossip-protocol-perfect" target="_blank">a few minutes</a> for a transaction to make it to the rest of the Bitcoin network! At the time of writing, there are <a href="https://bitnodes.io/" target="_blank">over 15,000 Bitcoin nodes worldwide</a>.</p>
                     <p>We'll be using that same Bitcoin Core software from earlier to do the broadcast. The command name is <code><a href="https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html" target="_blank">sendrawtransaction</a></code> and it accepts the transaction in hexadecimal format.</p>
                     <p>The conversion to hex has already been done for you, but you will notice that it comes out to be quite a long string of letters and numbers! Copy the following command and run it in the console:</p>
