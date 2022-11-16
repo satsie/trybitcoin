@@ -53,7 +53,7 @@ gulp.task('browser-sync', function() {
 });
 
 gulp.task('copy-deploy-files', function (done) {
-    gulp.src(['index.html', 'fr.html', 'assets/*', 'build/*'], {base: '.'})
+    gulp.src(['index.html', 'fr.html', 'es.html', 'assets/*', 'build/*'], {base: '.'})
       .pipe(gulp.dest('./deploy/'));
     done();
 });
